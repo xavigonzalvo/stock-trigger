@@ -77,7 +77,10 @@ def main(argv):
     print '%d weeks for analysis (%d months, %d years)' % (
         len(week_values), len(week_values) / 4, len(week_values) / 4 / 12)
     ProcessWeeks(data, week_values, num_weeks)
-    output_figure_path = os.path.join(output_path, '%s-%s.png' % (Basename(filename), str(num_weeks) if num_weeks > 0 else 'all'))
+    output_figure_path = os.path.join(
+        output_path,
+        '%s-%s.png' % (Basename(filename),
+                       str(num_weeks) if num_weeks > 0 else 'all'))
     plt.savefig(output_figure_path)
 
 
