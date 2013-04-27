@@ -1,5 +1,6 @@
 import csv
 import math
+import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np 
@@ -50,12 +51,20 @@ def ProcessWeeks(data, week_values):
     plt.draw()
 
 
+def Basename(path):
+    return os.path.basename(os.path.splitext(path)[0])
+
+
 def main(argv):
-    (data, week_values) = OpenFile(argv[1])
+    filename = argv[1]
+    output_path = argv[2]
+    (data, week_values) = OpenFile(filename)
     print '%d weeks for analysis (%d months, %d years)' % (
         len(week_values), len(week_values) / 4, len(week_values) / 4 / 12)
     ProcessWeeks(data, week_values)
-    plt.show(block=False)
+    output_figure_path = os.path.join(output_path, '%s.png' % Basename(filename))
+    plt.savefig(output_figure_path)
+
 
 if __name__ == "__main__":
     main(sys.argv)
