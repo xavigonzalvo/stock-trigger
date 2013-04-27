@@ -3,7 +3,8 @@ import math
 import os
 import sys
 import matplotlib.pyplot as plt
-import numpy as np 
+import numpy as np
+from scipy import optimize
 
 def OpenFile(filename):
     """Open file and returns all data as a list and week close values.
@@ -62,11 +63,38 @@ def ProcessWeeks(data, week_values, num_weeks):
     plt.subplot(212)
     _PlotHist(hist, bins)
     plt.draw()
+
+    QuadraticFitting(rev_week_values[len(week_values) - num_weeks:])
     return num_weeks
 
 
 def Basename(path):
     return os.path.basename(os.path.splitext(path)[0])
+
+
+def QuadraticFitting(values):
+    # Parametric function: 'v' is the parameter vector, 'x' the
+    # independent variable
+    fp = lambda v, x: v[0] * x ** 2 + v[1] * x + v[2]
+    # Error function
+    e = lambda v, x, y: (fp(v, x) - y)
+
+    # Initial parameter value
+    v0 = [3., 1, 4.]
+
+    # Data.
+    n = len(values)
+    xmin = 0
+    xmax = len(values)
+    x = np.linspace(xmin, xmax, n)
+    y = values
+
+    # Fitting.
+    polynomial, success =  optimize.leastsq(e, v0, args=(x, y), maxfev=10000)
+    print 'Estimated polynomial: %s' % str(polynomial)
+    plt.figure()
+    plt.plot(x, y, 'ro', x, fp(polynomial, x))
+    plt.show()
 
 
 def main(argv):
