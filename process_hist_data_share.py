@@ -31,9 +31,21 @@ def _PlotHist(hist, bin_edges):
     return plt
 
 
-def ProcessWeeks(data, week_values):
+def ProcessWeeks(data, week_values, num_weeks):
+    """Processes weeks.
+
+    Args:
+      data: values for each week in reverse order (ie. latest first)
+      week_values: share price for each week in reverse order
+      num_weeks: number of weeks to analyse from latest week
+    """
     slopes = []
-    for week in range(0, len(week_values) - 1):
+    if num_weeks <= 0:
+        num_weeks = len(week_values) - 1
+    else:
+        num_weeks = min(num_weeks, len(week_values) - 1)
+    print "Analyzing %d weeks" % num_weeks
+    for week in range(0, num_weeks):
         slope = (week_values[week] - week_values[week + 1]) / 7
         #print 'w=%d date=%s v=%f m=%f d=%f' % (week,
         #                                       data[week][0],
@@ -45,10 +57,12 @@ def ProcessWeeks(data, week_values):
                                                      max(slopes)), density=True)
     print "Mean: %f, Std: %f" % (np.mean(slopes), np.std(slopes))
     plt.subplot(211)
-    plt.plot(week_values[::-1])
+    rev_week_values = week_values[::-1]
+    plt.plot(rev_week_values[len(week_values) - num_weeks:])
     plt.subplot(212)
     _PlotHist(hist, bins)
     plt.draw()
+    return num_weeks
 
 
 def Basename(path):
@@ -58,11 +72,12 @@ def Basename(path):
 def main(argv):
     filename = argv[1]
     output_path = argv[2]
+    num_weeks = int(argv[3])
     (data, week_values) = OpenFile(filename)
     print '%d weeks for analysis (%d months, %d years)' % (
         len(week_values), len(week_values) / 4, len(week_values) / 4 / 12)
-    ProcessWeeks(data, week_values)
-    output_figure_path = os.path.join(output_path, '%s.png' % Basename(filename))
+    ProcessWeeks(data, week_values, num_weeks)
+    output_figure_path = os.path.join(output_path, '%s-%s.png' % (Basename(filename), str(num_weeks) if num_weeks > 0 else 'all'))
     plt.savefig(output_figure_path)
 
 
