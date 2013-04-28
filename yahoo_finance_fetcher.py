@@ -2,15 +2,22 @@ import urllib
 import urllib2
 
 
+class Error(Exception):
+    pass
+
+
 class YahooFinanceFetcher(object):
 
     def __init__(self):
         self.__HISTORICAL_SERVER = 'http://ichart.yahoo.com/table.csv'
 
     def _GetData(self, server, values):
-        data = urllib.urlencode(values)
-        resp = urllib2.urlopen('%s?%s' % (server, data))
-        return resp.read()
+        try:
+            data = urllib.urlencode(values)
+            resp = urllib2.urlopen('%s?%s' % (server, data))
+            return resp.read()
+        except urllib2.HTTPError:
+            raise Error('Not found')
 
     def GetHistorical(self, symbol, start_year, end_year, period):
         """Gets historical values.
