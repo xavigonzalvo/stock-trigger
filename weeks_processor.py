@@ -1,14 +1,10 @@
 import csv
 import math
 import os
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-import curve_fitting
-
-
-def OpenFile(filename):
+def ReadData(filename):
     """Open file and returns all data as a list and week close values.
 
     Args:
@@ -75,50 +71,3 @@ class WeeksProcessor(object):
         self._PlotHist(hist, bins)
         plt.draw()
         return (week_values, np.mean(slopes), np.std(slopes))
-
-
-def Basename(path):
-    return os.path.basename(os.path.splitext(path)[0])
-    
-
-def main(argv):
-    filename = argv[1]
-    output_path = argv[2]
-    num_weeks = int(argv[3])
-
-    # Read data.
-    data = OpenFile(filename)
-    total_num_weeks = len(data)
-    print '%d weeks for analysis (%d months, %d years)' % (
-        total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12)
-
-    # Process.
-    runner = WeeksProcessor(data, num_weeks)
-    plt.subplot(411)
-    (week_values, mean, std) = runner.Process()
-    print "Mean: %f, Std: %f" % (mean, std)
-
-    plt.subplot(412)
-    rev_week_values = week_values[::-1]
-    plt.plot(rev_week_values)
-
-    plt.subplot(413)
-    fitter = curve_fitting.CurveFitting(rev_week_values)
-    poly, error, convex = fitter.Quadratic()
-    print 'Estimated quadratic polynomial (%s): %s (error: %f)' % (
-        'convex' if convex else 'concave', str(poly), error)
-    plt.subplot(414)
-    poly, error = fitter.Cubic()
-    print 'Estimated cubic polynomial: %s (error: %f)' % (
-        str(poly), error)
-
-    # Save figures
-    output_figure_path = os.path.join(
-        output_path,
-        '%s-%s.png' % (Basename(filename),
-                       str(num_weeks) if num_weeks > 0 else 'all'))
-    plt.savefig(output_figure_path)
-
-
-if __name__ == "__main__":
-    main(sys.argv)
