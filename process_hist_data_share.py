@@ -94,17 +94,21 @@ def main(argv):
 
     # Process.
     runner = WeeksProcessor(data, num_weeks)
-    plt.subplot(311)
+    plt.subplot(411)
     (week_values, mean, std) = runner.Process()
     print "Mean: %f, Std: %f" % (mean, std)
 
-    plt.subplot(312)
+    plt.subplot(412)
     rev_week_values = week_values[::-1]
     plt.plot(rev_week_values)
 
-    plt.subplot(313)
+    plt.subplot(413)
     fitter = curve_fitting.CurveFitting(rev_week_values)
-    fitter.Quadratic()
+    quadratic_poly = fitter.Quadratic()
+    print 'Estimated quadratic polynomial: %s' % str(quadratic_poly)
+    plt.subplot(414)
+    cubic_poly = fitter.Cubic()
+    print 'Estimated cubic polynomial: %s' % str(cubic_poly)
 
     # Save figures
     output_figure_path = os.path.join(
