@@ -28,12 +28,14 @@ class CurveFittingTest(unittest.TestCase):
         self.__cf = CurveFitting(values)
         poly, error, convex = self.__cf.Quadratic()
         self.assertTrue(self.Equals(poly, [1.0, 0, 0]))
+        self.assertTrue(convex)
 
     def testFit3(self):
         values = [10., 11., 13., 15., 12., 14., 12.]
         self.__cf = CurveFitting(values)
         poly, error, convex = self.__cf.Quadratic()
         self.assertTrue(self.Equals(poly, [-10.71, 13.0714, 9.7619]))
+        self.assertFalse(convex)
 
 
 if __name__ == '__main__':
