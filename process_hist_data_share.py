@@ -8,64 +8,72 @@ from scipy import optimize
 
 def OpenFile(filename):
     """Open file and returns all data as a list and week close values.
+
+    Args:
+      filename: input file.
+    Returns:
+      A list of dictionaries, each containing a row of the CSV file.
     """
     with open(filename, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
-        first = True
-        week_values = []
         data = []
-        pos_close = -1
+        header = []
         for row in reader:
-            if first:
-                header = row
-                pos_close = header.index('Close')
-                first = False
+            if not header:
+                header = [value.lower() for value in row]
             else:
-                week_values.append(float(row[pos_close]))
-                data.append(row)
-        return (data, week_values)
+                values = dict(zip(header, row))
+                data.append(values)
+        return data
 
-        
+
 def _PlotHist(hist, bin_edges):
     plt.bar(bin_edges[:-1], hist, width = 1)
     plt.xlim(min(bin_edges), max(bin_edges))
     return plt
 
 
-def ProcessWeeks(data, week_values, num_weeks):
-    """Processes weeks.
+class WeeksProcessor(object):
 
-    Args:
-      data: values for each week in reverse order (ie. latest first)
-      week_values: share price for each week in reverse order
-      num_weeks: number of weeks to analyse from latest week
-    """
-    slopes = []
-    if num_weeks <= 0:
-        num_weeks = len(week_values) - 1
-    else:
-        num_weeks = min(num_weeks, len(week_values) - 1)
-    print "Analyzing %d weeks" % num_weeks
-    for week in range(0, num_weeks):
-        slope = (week_values[week] - week_values[week + 1]) / 7
-        #print 'w=%d date=%s v=%f m=%f d=%f' % (week,
-        #                                       data[week][0],
-        #                                       week_values[week],
-        #                                       slope,
-        #                                       math.atan(slope) * 180 / math.pi)
-        slopes.append(slope)
-    hist, bins = np.histogram(slopes, bins=np.arange(min(slopes),
-                                                     max(slopes)), density=True)
-    print "Mean: %f, Std: %f" % (np.mean(slopes), np.std(slopes))
-    plt.subplot(211)
-    rev_week_values = week_values[::-1]
-    plt.plot(rev_week_values[len(week_values) - num_weeks:])
-    plt.subplot(212)
-    _PlotHist(hist, bins)
-    plt.draw()
+    def __init__(self, data, num_weeks):
+        """Constructor.
 
-    QuadraticFitting(rev_week_values[len(week_values) - num_weeks:])
-    return num_weeks
+        Args:
+          data: values for each week in reverse order (ie. latest first)
+          num_weeks: number of weeks to analyse from latest week
+        """
+        self.__data = data
+        self.__num_weeks = self._GetNumWeeks(num_weeks)
+        
+    def _GetNumWeeks(self, num_weeks):
+        if num_weeks <= 0:
+            num_weeks = len(self.__data) - 1
+        else:
+            num_weeks = min(num_weeks, len(self.__data) - 1)
+        print "Analyzing %d weeks" % num_weeks
+        return num_weeks
+    
+    def Process(self):
+        """Processes weeks and computes statistic indicators.
+
+        Returns:
+          A tuple containing the week values, mean, std.
+        """
+        slopes = []
+        week_values = []
+        for week in range(0, self.__num_weeks):
+            current_week = float(self.__data[week]['close'])
+            next_week = float(self.__data[week + 1]['close'])
+            slope = (current_week - next_week) / 7
+            slopes.append(slope)
+            week_values.append(current_week)
+
+        hist, bins = np.histogram(slopes,
+                                  bins=np.arange(min(slopes),
+                                                 max(slopes)), density=True)
+        _PlotHist(hist, bins)
+        plt.draw()
+        return (week_values, np.mean(slopes), np.std(slopes))
 
 
 def Basename(path):
@@ -75,12 +83,13 @@ def Basename(path):
 def QuadraticFitting(values):
     # Parametric function: 'v' is the parameter vector, 'x' the
     # independent variable
-    fp = lambda v, x: v[0] * x ** 2 + v[1] * x + v[2]
+    #fp = lambda v, x: v[0] * x ** 2 + v[1] * x + v[2]
+    fp = lambda v, x: v[0] * x ** 3 + v[1] * x ** 2 + v[2] ** x + v[3]
     # Error function
     e = lambda v, x, y: (fp(v, x) - y)
 
     # Initial parameter value
-    v0 = [3., 1, 4.]
+    v0 = [3., 1, 4., 0.1]
 
     # Data.
     n = len(values)
@@ -92,19 +101,35 @@ def QuadraticFitting(values):
     # Fitting.
     polynomial, success =  optimize.leastsq(e, v0, args=(x, y), maxfev=10000)
     print 'Estimated polynomial: %s' % str(polynomial)
-    plt.figure()
     plt.plot(x, y, 'ro', x, fp(polynomial, x))
-    plt.show()
+    plt.draw()
 
 
 def main(argv):
     filename = argv[1]
     output_path = argv[2]
     num_weeks = int(argv[3])
-    (data, week_values) = OpenFile(filename)
+
+    # Read data.
+    data = OpenFile(filename)
+    total_num_weeks = len(data)
     print '%d weeks for analysis (%d months, %d years)' % (
-        len(week_values), len(week_values) / 4, len(week_values) / 4 / 12)
-    ProcessWeeks(data, week_values, num_weeks)
+        total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12)
+
+    # Process.
+    runner = WeeksProcessor(data, num_weeks)
+    plt.subplot(311)
+    (week_values, mean, std) = runner.Process()
+    print "Mean: %f, Std: %f" % (mean, std)
+
+    plt.subplot(312)
+    rev_week_values = week_values[::-1]
+    plt.plot(rev_week_values)
+
+    plt.subplot(313)
+    QuadraticFitting(rev_week_values)
+
+    # Save figures
     output_figure_path = os.path.join(
         output_path,
         '%s-%s.png' % (Basename(filename),
