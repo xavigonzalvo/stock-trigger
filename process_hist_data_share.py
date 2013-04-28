@@ -4,7 +4,9 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import optimize
+
+import curve_fitting
+
 
 def OpenFile(filename):
     """Open file and returns all data as a list and week close values.
@@ -27,12 +29,6 @@ def OpenFile(filename):
         return data
 
 
-def _PlotHist(hist, bin_edges):
-    plt.bar(bin_edges[:-1], hist, width = 1)
-    plt.xlim(min(bin_edges), max(bin_edges))
-    return plt
-
-
 class WeeksProcessor(object):
 
     def __init__(self, data, num_weeks):
@@ -52,7 +48,12 @@ class WeeksProcessor(object):
             num_weeks = min(num_weeks, len(self.__data) - 1)
         print "Analyzing %d weeks" % num_weeks
         return num_weeks
-    
+
+    def _PlotHist(self, hist, bin_edges):
+        plt.bar(bin_edges[:-1], hist, width = 1)
+        plt.xlim(min(bin_edges), max(bin_edges))
+        return plt
+
     def Process(self):
         """Processes weeks and computes statistic indicators.
 
@@ -71,39 +72,14 @@ class WeeksProcessor(object):
         hist, bins = np.histogram(slopes,
                                   bins=np.arange(min(slopes),
                                                  max(slopes)), density=True)
-        _PlotHist(hist, bins)
+        self._PlotHist(hist, bins)
         plt.draw()
         return (week_values, np.mean(slopes), np.std(slopes))
 
 
 def Basename(path):
     return os.path.basename(os.path.splitext(path)[0])
-
-
-def QuadraticFitting(values):
-    # Parametric function: 'v' is the parameter vector, 'x' the
-    # independent variable
-    #fp = lambda v, x: v[0] * x ** 2 + v[1] * x + v[2]
-    fp = lambda v, x: v[0] * x ** 3 + v[1] * x ** 2 + v[2] ** x + v[3]
-    # Error function
-    e = lambda v, x, y: (fp(v, x) - y)
-
-    # Initial parameter value
-    v0 = [3., 1, 4., 0.1]
-
-    # Data.
-    n = len(values)
-    xmin = 0
-    xmax = len(values)
-    x = np.linspace(xmin, xmax, n)
-    y = values
-
-    # Fitting.
-    polynomial, success =  optimize.leastsq(e, v0, args=(x, y), maxfev=10000)
-    print 'Estimated polynomial: %s' % str(polynomial)
-    plt.plot(x, y, 'ro', x, fp(polynomial, x))
-    plt.draw()
-
+    
 
 def main(argv):
     filename = argv[1]
@@ -127,7 +103,8 @@ def main(argv):
     plt.plot(rev_week_values)
 
     plt.subplot(313)
-    QuadraticFitting(rev_week_values)
+    fitter = curve_fitting.CurveFitting(rev_week_values)
+    fitter.Quadratic()
 
     # Save figures
     output_figure_path = os.path.join(
