@@ -24,12 +24,16 @@ class CurveFitting(object):
         """Quadratic polynomial fit.
 
         Returns:
-          Polynomial coefficients.
+          Polynomial coefficients, root squared error and convexity.
         """
         # Parametric function: 'v' is the parameter vector, 'x' the
         # independent variable.
         fpc = lambda v, x: v[0] * x ** 2 + v[1] * x + v[2]
-        return self._Fit(fpc, [3., 1, 4.])
+        (poly, error) = self._Fit(fpc, [3., 1, 4.])
+        convex = False
+        if poly[0] > 0:
+            convex = True
+        return (poly, error, convex)
 
     def _Fit(self, fp, v0):
         """Curve fitting.
@@ -39,7 +43,7 @@ class CurveFitting(object):
           v0: Initial parameter values.
 
         Returns:
-          Polynomial coefficients.
+          A tuple with polynomial coefficients and root squared error.
         """
         # Error function.
         e = lambda v, x, y: (fp(v, x) - y)
