@@ -20,6 +20,9 @@ class YahooFinanceFetcher(object):
           start_year: from year
           end_year: to year
           period: 'd'=day, 'w'=week, 'm'=month
+
+        Returns:
+          A string containing the data.
         """
         values = {'s': symbol,
                   'a': 0,
@@ -30,4 +33,4 @@ class YahooFinanceFetcher(object):
                   'f': end_year,
                   'g': period,
                   'ignore': '.csv'}
-        self._GetData(self.__HISTORICAL_SERVER, values)
+        return self._GetData(self.__HISTORICAL_SERVER, values)
