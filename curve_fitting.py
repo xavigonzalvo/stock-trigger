@@ -47,14 +47,21 @@ class CurveFitting(object):
         # Data.
         n = len(self.__values)
         xmin = 0
-        xmax = n
+        xmax = 1.0
         x = np.linspace(xmin, xmax, n)
         y = self.__values
 
         # Fitting.
-        polynomial, success =  optimize.leastsq(e, v0, args=(x, y),
-                                                maxfev=10000)
-        plt.plot(x, y, 'ro', x, fp(polynomial, x))
+        poly, cov, infodict, mesg, ier = optimize.leastsq(
+            e, v0, args=(x, y),
+            full_output=True,
+            maxfev=10000)
+        ss_err = (infodict['fvec'] ** 2).sum()
+        ss_tot = ((y - np.mean(y)) ** 2).sum()
+        rsquared = 1 - (ss_err / ss_tot)
+
+        # Plot.
+        plt.plot(x, y, 'ro', x, fp(poly, x))
         plt.draw()
 
-        return polynomial
+        return (poly, rsquared)

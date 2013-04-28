@@ -104,11 +104,13 @@ def main(argv):
 
     plt.subplot(413)
     fitter = curve_fitting.CurveFitting(rev_week_values)
-    quadratic_poly = fitter.Quadratic()
-    print 'Estimated quadratic polynomial: %s' % str(quadratic_poly)
+    quadratic_poly, quadratic_error = fitter.Quadratic()
+    print 'Estimated quadratic polynomial: %s (error: %f)' % (
+        str(quadratic_poly), quadratic_error)
     plt.subplot(414)
-    cubic_poly = fitter.Cubic()
-    print 'Estimated cubic polynomial: %s' % str(cubic_poly)
+    cubic_poly, cubic_error = fitter.Cubic()
+    print 'Estimated cubic polynomial: %s (error: %f)' % (
+        str(cubic_poly), cubic_error)
 
     # Save figures
     output_figure_path = os.path.join(
