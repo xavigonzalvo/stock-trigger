@@ -15,6 +15,27 @@ flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
 FLAGS = flags.Parse()
 
 
+class Result(object):
+
+    def __init__(self):
+        self.mean = 0.0
+        self.std = 0.0
+        self.convex = False
+        self.quadratic_poly = None
+        self.quadratic_error = 0.0
+        self.cubic_poly = None
+        self.cubic_error = 0.0
+
+    def ToString(self):
+        return ('Mean: %f, Std: %f\n'
+                'Estimated quadratic polynomial (%s): %s (error: %f)\n'
+                'Estimated cubic polynomial (%s) (error: %f)\n') % (
+                    self.mean, self.std, 'convex' if self.convex else 'concave',
+                    str(self.quadratic_poly), self.quadratic_error,
+                    str(self.cubic_poly), self.cubic_error)
+
+
+
 def main():
     # Read data.
     data = weeks_processor.ReadData(FLAGS.filename)
@@ -26,7 +47,9 @@ def main():
     runner = weeks_processor.WeeksProcessor(data, FLAGS.num_weeks)
     plt.subplot(411)
     (week_values, mean, std) = runner.Process()
-    print "Mean: %f, Std: %f" % (mean, std)
+    result = Result()
+    result.mean = mean
+    result.std = std
 
     plt.subplot(412)
     rev_week_values = week_values[::-1]
@@ -35,20 +58,31 @@ def main():
     plt.subplot(413)
     fitter = curve_fitting.CurveFitting(rev_week_values)
     poly, error, convex = fitter.Quadratic()
-    print 'Estimated quadratic polynomial (%s): %s (error: %f)' % (
-        'convex' if convex else 'concave', str(poly), error)
+    result.quadratic_poly = poly
+    result.quadratic_error = error
+    result.convex = convex
+
     plt.subplot(414)
     poly, error = fitter.Cubic()
-    print 'Estimated cubic polynomial: %s (error: %f)' % (
-        str(poly), error)
+    result.cubic_poly = poly
+    result.cubic_error = error
 
-    # Save figures
+    filename = '%s-%s' % (
+        util.Basename(FLAGS.filename),
+        str(FLAGS.num_weeks) if FLAGS.num_weeks > 0 else 'all')
+    # Save figures.
     output_figure_path = os.path.join(
         FLAGS.output_path,
-        '%s-%s.png' % (util.Basename(FLAGS.filename),
-                       str(FLAGS.num_weeks) if FLAGS.num_weeks > 0 else 'all'))
+        '%s.png' % filename)
     plt.savefig(output_figure_path)
 
+    # Save result.
+    output_result_path = os.path.join(
+        FLAGS.output_path,
+        '%s.res' % filename)
+    print output_result_path
+    with open(output_result_path, 'w') as f:
+        f.write(result.ToString())
 
 
 if __name__ == "__main__":    
