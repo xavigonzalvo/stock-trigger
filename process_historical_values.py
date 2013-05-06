@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import os
+from google.protobuf import text_format
 
 import curve_fitting
 import flags
 import util
 import weeks_processor
+import week_result_pb2
 
 flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
@@ -13,27 +15,6 @@ flags.FLAGS.add_argument("--output_path", required=True,
 flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
                          help="Number of weeks. Starting from last")
 FLAGS = flags.Parse()
-
-
-class Result(object):
-
-    def __init__(self):
-        self.mean = 0.0
-        self.std = 0.0
-        self.convex = False
-        self.quadratic_poly = None
-        self.quadratic_error = 0.0
-        self.cubic_poly = None
-        self.cubic_error = 0.0
-
-    def ToString(self):
-        return ('Mean: %f, Std: %f\n'
-                'Estimated quadratic polynomial (%s): %s (error: %f)\n'
-                'Estimated cubic polynomial (%s) (error: %f)\n') % (
-                    self.mean, self.std, 'convex' if self.convex else 'concave',
-                    str(self.quadratic_poly), self.quadratic_error,
-                    str(self.cubic_poly), self.cubic_error)
-
 
 
 def main():
@@ -47,7 +28,7 @@ def main():
     runner = weeks_processor.WeeksProcessor(data, FLAGS.num_weeks)
     plt.subplot(411)
     (week_values, mean, std) = runner.Process()
-    result = Result()
+    result = week_result_pb2.WeekResult()
     result.mean = mean
     result.std = std
 
@@ -58,14 +39,18 @@ def main():
     plt.subplot(413)
     fitter = curve_fitting.CurveFitting(rev_week_values)
     poly, error, convex = fitter.Quadratic()
-    result.quadratic_poly = poly
-    result.quadratic_error = error
-    result.convex = convex
+    quadratic_poly = result.poly.add()
+    quadratic_poly.order = 2
+    quadratic_poly.coef.extend(list(poly))
+    quadratic_poly.error = error
+    quadratic_poly.convex = convex
 
     plt.subplot(414)
     poly, error = fitter.Cubic()
-    result.cubic_poly = poly
-    result.cubic_error = error
+    cubic_poly = result.poly.add()
+    cubic_poly.order = 3
+    cubic_poly.coef.extend(list(poly))
+    cubic_poly.error = error
 
     filename = '%s-%s' % (
         util.Basename(FLAGS.filename),
@@ -82,7 +67,7 @@ def main():
         '%s.res' % filename)
     print output_result_path
     with open(output_result_path, 'w') as f:
-        f.write(result.ToString())
+        f.write(text_format.MessageToString(result))
 
 
 if __name__ == "__main__":    
