@@ -2,7 +2,7 @@ import urllib
 import urllib2
 
 
-class Error(Exception):
+class YahooFinanceFetcherError(Exception):
     pass
 
 
@@ -10,6 +10,7 @@ class YahooFinanceFetcher(object):
 
     def __init__(self):
         self.__HISTORICAL_SERVER = 'http://ichart.yahoo.com/table.csv'
+        self.__QUOTE_SERVER = 'http://download.finance.yahoo.com/d/quotes.csv'
 
     def _GetData(self, server, values):
         try:
@@ -17,7 +18,7 @@ class YahooFinanceFetcher(object):
             resp = urllib2.urlopen('%s?%s' % (server, data))
             return resp.read()
         except urllib2.HTTPError:
-            raise Error('Not found')
+            raise YahooFinanceFetcherError('Not found')
 
     def GetHistorical(self, symbol, start_year, end_year, period):
         """Gets historical values.
@@ -41,3 +42,9 @@ class YahooFinanceFetcher(object):
                   'g': period,
                   'ignore': '.csv'}
         return self._GetData(self.__HISTORICAL_SERVER, values)
+
+    def GetMarketCap(self, symbol):
+        values = {'s': symbol,
+                  'f': 'j1',
+                  'e': '.csv'}
+        return self._GetData(self.__QUOTE_SERVER, values)
