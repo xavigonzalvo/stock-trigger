@@ -72,8 +72,8 @@ def main():
         total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12)
 
     # Process data.
-    runner = weeks_processor.WeeksProcessor(data, FLAGS.num_weeks)
-    (slopes, week_values, mean, std) = runner.Process()
+    processor = weeks_processor.WeeksProcessor(data, FLAGS.num_weeks)
+    (slopes, week_values, mean, std) = processor.Process()
 
     result = week_result_pb2.WeekResult()
     result.mean = mean

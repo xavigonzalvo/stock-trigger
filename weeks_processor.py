@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 def ReadData(filename):
-    """Open file and returns all data as a list and week close values.
+    """Opens file and returns all data as a list and week close values.
 
     Args:
       filename: input file.
