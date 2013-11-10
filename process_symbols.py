@@ -1,7 +1,7 @@
 """Process data of a list of symbols in parallel.
 """
 
-from multiprocessing import Pool
+from multiprocessing import Pool, Lock, Manager
 
 import flags
 import util
@@ -18,16 +18,19 @@ flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
 FLAGS = flags.Parse()
 
 
-def ProcessorWorker(filename, num_weeks, output_path):
-    symbol_data_generator.Run(filename, num_weeks, output_path)
+def ProcessorWorker(runner, filename, num_weeks, output_path):
+    runner.Run(filename, num_weeks, output_path)
 
 
 def main():
     data_files = util.SafeReadLines(FLAGS.filename)
     print 'Processing %d files' % len(data_files)
     pool = Pool(processes=FLAGS.num_threads)
+    manager = Manager()
+    lock = manager.Lock()
+    runner = symbol_data_generator.Runner(lock)
     for data_file in data_files:
-        pool.apply_async(ProcessorWorker, [data_file, FLAGS.num_weeks,
+        pool.apply_async(ProcessorWorker, [runner, data_file, FLAGS.num_weeks,
                                            FLAGS.output_path])
     pool.close()
     pool.join()

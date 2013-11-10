@@ -1,5 +1,7 @@
 """Tool to process information extracted from get_historical_data."""
 
+from multiprocessing import Lock
+
 import flags
 import symbol_data_generator
 
@@ -13,7 +15,8 @@ FLAGS = flags.Parse()
 
 
 def main():
-    symbol_data_generator.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path)
+    runner = symbol_data_generator.Runner(Lock())
+    runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path)
 
 if __name__ == "__main__":    
     main()
