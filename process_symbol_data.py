@@ -1,7 +1,7 @@
 """Tool to process information extracted from get_historical_data."""
 
 import flags
-import symbol_data_processor
+import symbol_data_generator
 
 flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
@@ -13,7 +13,7 @@ FLAGS = flags.Parse()
 
 
 def main():
-    symbol_data_processor.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path)
+    symbol_data_generator.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path)
 
 if __name__ == "__main__":    
     main()

@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 import flags
 import util
-import symbol_data_processor
+import symbol_data_generator
 
 flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
@@ -19,7 +19,7 @@ FLAGS = flags.Parse()
 
 
 def ProcessorWorker(filename, num_weeks, output_path):
-    symbol_data_processor.Run(filename, num_weeks, output_path)
+    symbol_data_generator.Run(filename, num_weeks, output_path)
 
 
 def main():
