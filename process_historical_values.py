@@ -22,23 +22,25 @@ FLAGS = flags.Parse()
 
 def MakePlots(rev_week_values, slopes, fitter,
               poly_quadratic, poly_cubic, poly_linear):
-    plt.subplot(511)
+    plt.subplot(411)
     plt.title('Histogram of gradients') 
     util.PlotHistogram(slopes)
 
-    plt.subplot(512)
+    plt.subplot(412)
     plt.title('Value per week')
     plt.plot(rev_week_values)
 
-    plt.subplot(513)
+    plt.subplot(413)
     plt.title('Quadratic fit')
     fitter.PlotPolynomial(poly_quadratic)
 
-    plt.subplot(514)
-    plt.title('Cubic fit')
-    fitter.PlotPolynomial(poly_cubic)
+    # TODO(xavigonzalvo): this is disabled as still trying to
+    # figure out what information can be extracted from cubic.
+    #plt.subplot(514)
+    #plt.title('Cubic fit')
+    #fitter.PlotPolynomial(poly_cubic)
 
-    plt.subplot(515)
+    plt.subplot(414)
     plt.title('Linear fit')
     fitter.PlotPolynomial(poly_linear)
 
@@ -57,11 +59,14 @@ def UpdateProto(fitter, result):
     quadratic_poly.error = error
     quadratic_poly.convex = convex
 
-    poly_cubic, error = fitter.Cubic()
-    cubic_poly = result.poly.add()
-    cubic_poly.order = 3
-    cubic_poly.coef.extend(list(poly_cubic))
-    cubic_poly.error = error
+    # TODO(xavigonzalvo): this is disabled as still trying to
+    # figure out what information can be extracted from cubic.
+    poly_cubic = None
+    #poly_cubic, error = fitter.Cubic()
+    #cubic_poly = result.poly.add()
+    #cubic_poly.order = 3
+    #cubic_poly.coef.extend(list(poly_cubic))
+    #cubic_poly.error = error
     return (poly_quadratic, poly_cubic, poly_linear)
 
 
