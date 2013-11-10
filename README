@@ -1,0 +1,7 @@
+Trading tools
+-------------
+
+First, get some historical data.
+
+python get_historical_data.py --filename config/symbols_little --output_path data/ --num_threads=10
+

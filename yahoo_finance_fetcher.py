@@ -1,3 +1,5 @@
+"""Library to fetch information from Yahoo."""
+
 import urllib
 import urllib2
 

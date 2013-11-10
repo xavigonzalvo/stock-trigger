@@ -1,7 +1,6 @@
 import csv
 import math
 import os
-import matplotlib.pyplot as plt
 import numpy as np
 
 def ReadData(filename):
@@ -34,6 +33,7 @@ class WeeksProcessor(object):
           data: values for each week in reverse order (ie. latest first)
           num_weeks: number of weeks to analyse from latest week
         """
+        self._NUM_DAYS_IN_WEEK = 5
         self.__data = data
         self.__num_weeks = self._GetNumWeeks(num_weeks)
         
@@ -45,29 +45,18 @@ class WeeksProcessor(object):
         print "Analyzing %d weeks" % num_weeks
         return num_weeks
 
-    def _PlotHist(self, hist, bin_edges):
-        plt.bar(bin_edges[:-1], hist, width = 1)
-        plt.xlim(min(bin_edges), max(bin_edges))
-        return plt
-
     def Process(self):
         """Processes weeks and computes statistic indicators.
 
         Returns:
-          A tuple containing the week values, mean, std.
+          A tuple containing the slopes, week values, mean and std.
         """
         slopes = []
         week_values = []
         for week in range(0, self.__num_weeks):
             current_week = float(self.__data[week]['close'])
             next_week = float(self.__data[week + 1]['close'])
-            slope = (current_week - next_week) / 7
+            slope = (current_week - next_week) / self._NUM_DAYS_IN_WEEK
             slopes.append(slope)
             week_values.append(current_week)
-
-        hist, bins = np.histogram(slopes,
-                                  bins=np.arange(min(slopes),
-                                                 max(slopes)), density=True)
-        self._PlotHist(hist, bins)
-        plt.draw()
-        return (week_values, np.mean(slopes), np.std(slopes))
+        return (slopes, week_values, np.mean(slopes), np.std(slopes))
