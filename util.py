@@ -3,6 +3,7 @@
 import os.path
 import matplotlib.pyplot as plt
 import numpy as np
+import re
 
 
 def Basename(path):
@@ -21,3 +22,7 @@ def PlotHistogram(values):
     plt.bar(bins[:-1], hist, width = 1)
     plt.xlim(min(bins), max(bins))
     return plt.draw()
+
+
+def GetSymbolFromFilename(filename):
+    return re.search("(.*?)\-", os.path.basename(filename)).groups()[0]

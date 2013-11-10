@@ -13,7 +13,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='week_result.proto',
   package='',
-  serialized_pb='\n\x11week_result.proto\"O\n\nPolynomial\x12\r\n\x05order\x18\x01 \x02(\x05\x12\x0c\n\x04\x63oef\x18\x02 \x03(\x01\x12\r\n\x05\x65rror\x18\x03 \x01(\x01\x12\x15\n\x06\x63onvex\x18\x04 \x01(\x08:\x05\x66\x61lse\"B\n\nWeekResult\x12\x0c\n\x04mean\x18\x01 \x01(\x01\x12\x0b\n\x03std\x18\x02 \x01(\x01\x12\x19\n\x04poly\x18\x04 \x03(\x0b\x32\x0b.Polynomial')
+  serialized_pb='\n\x11week_result.proto\"O\n\nPolynomial\x12\r\n\x05order\x18\x01 \x02(\x05\x12\x0c\n\x04\x63oef\x18\x02 \x03(\x01\x12\r\n\x05\x65rror\x18\x03 \x01(\x01\x12\x15\n\x06\x63onvex\x18\x04 \x01(\x08:\x05\x66\x61lse\"V\n\nWeekResult\x12\x0c\n\x04mean\x18\x01 \x01(\x01\x12\x0b\n\x03std\x18\x02 \x01(\x01\x12\x19\n\x04poly\x18\x04 \x03(\x0b\x32\x0b.Polynomial\x12\x12\n\nmarket_cap\x18\x05 \x01(\x01')
 
 
 
@@ -95,6 +95,13 @@ _WEEKRESULT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='market_cap', full_name='WeekResult.market_cap', index=3,
+      number=5, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -105,7 +112,7 @@ _WEEKRESULT = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=102,
-  serialized_end=168,
+  serialized_end=188,
 )
 
 _WEEKRESULT.fields_by_name['poly'].message_type = _POLYNOMIAL

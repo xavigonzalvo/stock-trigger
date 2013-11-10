@@ -21,4 +21,7 @@ message WeekResult {
 
   // A list of models (ie. polynomials of various orders).
   repeated Polynomial poly = 4;
+
+  // Market capitalization in millions.
+  optional double market_cap = 5;
 }

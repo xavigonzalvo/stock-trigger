@@ -1,7 +1,6 @@
 import csv
-import math
-import os
 import numpy as np
+
 
 def ReadData(filename):
     """Opens file and returns all data as a list and week close values.

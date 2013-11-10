@@ -9,6 +9,7 @@ import flags
 import util
 import weeks_processor
 import week_result_pb2
+import yahoo_finance_fetcher as YFetcher
 
 flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
@@ -78,6 +79,10 @@ def main():
     result = week_result_pb2.WeekResult()
     result.mean = mean
     result.std = std
+    symbol = util.GetSymbolFromFilename(FLAGS.filename)
+    print 'Processing "%s"' % symbol
+    fetcher = YFetcher.YahooFinanceFetcher()
+    result.market_cap = fetcher.GetMarketCap(symbol)
 
     # Fit model.
     rev_week_values = week_values[::-1]

@@ -2,6 +2,7 @@
 
 import urllib
 import urllib2
+import re
 
 
 class YahooFinanceFetcherError(Exception):
@@ -46,7 +47,9 @@ class YahooFinanceFetcher(object):
         return self._GetData(self.__HISTORICAL_SERVER, values)
 
     def GetMarketCap(self, symbol):
+        """Gets market capitalization in millions."""
         values = {'s': symbol,
                   'f': 'j1',
                   'e': '.csv'}
-        return self._GetData(self.__QUOTE_SERVER, values)
+        info = self._GetData(self.__QUOTE_SERVER, values)
+        return float(re.findall("\d+.\d+", info)[0])
