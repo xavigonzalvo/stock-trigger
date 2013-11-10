@@ -3,10 +3,11 @@
   <tool> --filename <symbols> --output_path <output>
 """
 
-import flags
 import os
 from multiprocessing import Pool
 
+import flags
+import util
 import yahoo_finance_fetcher as YFetcher
 
 flags.FLAGS.add_argument("--filename", required=True,
@@ -35,10 +36,7 @@ def FetcherWorker(fetcher, symbol):
 
 
 def main():
-    symbols = []
-    with open(FLAGS.filename) as f:
-        for symbol in f.readlines():
-            symbols.append(symbol.strip())
+    symbols = util.SafeReadLines(FLAGS.filename)
 
     print "%d symbols to fetch" % len(symbols)
     fetcher = YFetcher.YahooFinanceFetcher()
