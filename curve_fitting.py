@@ -1,6 +1,5 @@
 import numpy as np
 from scipy import optimize
-import random
 import matplotlib.pyplot as plt
 
 
@@ -96,6 +95,8 @@ class CurveFitting(object):
             maxfev=10000)
         ss_err = (infodict['fvec'] ** 2).sum()
         ss_tot = ((self.y - np.mean(self.y)) ** 2).sum()
-        rsquared = 1 - (ss_err / ss_tot)
+        rsquared = 0
+        if ss_tot != 0:
+            rsquared = 1 - (ss_err / ss_tot)
 
         return (poly, rsquared)

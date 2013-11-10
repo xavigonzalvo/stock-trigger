@@ -70,21 +70,21 @@ def UpdateProto(fitter, result):
     return (poly_quadratic, poly_cubic, poly_linear)
 
 
-def main():
+def Run(filename, num_weeks, output_path):
     # Read data.
-    data = weeks_processor.ReadData(FLAGS.filename)
+    data = weeks_processor.ReadData(filename)
     total_num_weeks = len(data)
     print '%d weeks for analysis (%d months, %d years)' % (
         total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12)
 
     # Process data.
-    processor = weeks_processor.WeeksProcessor(data, FLAGS.num_weeks)
+    processor = weeks_processor.WeeksProcessor(data, num_weeks)
     (slopes, week_values, mean, std) = processor.Process()
 
     result = week_result_pb2.WeekResult()
     result.mean = mean
     result.std = std
-    symbol = util.GetSymbolFromFilename(FLAGS.filename)
+    symbol = util.GetSymbolFromFilename(filename)
     print 'Processing "%s"' % symbol
     fetcher = YFetcher.YahooFinanceFetcher()
     market_cap = fetcher.GetMarketCap(symbol)
@@ -103,19 +103,21 @@ def main():
               poly_quadratic, poly_cubic, poly_linear)
 
     # Save plots.
-    filename = '%s-%s' % (
-        util.Basename(FLAGS.filename),
-        str(FLAGS.num_weeks) if FLAGS.num_weeks > 0 else 'all')
+    filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
+                          if num_weeks > 0 else 'all')
     # Save figures.
-    output_figure_path = os.path.join(FLAGS.output_path, '%s.png' % filename)
+    output_figure_path = os.path.join(output_path, '%s.png' % filename)
     plt.savefig(output_figure_path)
 
     # Save result.
-    output_result_path = os.path.join(FLAGS.output_path, '%s.res' % filename)
+    output_result_path = os.path.join(output_path, '%s.res' % filename)
     print output_result_path
     with open(output_result_path, 'w') as f:
         f.write(text_format.MessageToString(result))
 
+
+def main():
+    Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path)
 
 if __name__ == "__main__":    
     main()

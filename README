@@ -9,5 +9,3 @@ Process data to get polynomial models:
 
 python process_historical_values.py --filename data/CAM.L-2010-2013-week.csv --output_path /tmp/res --num_weeks 8
 
-
-for f in `ls data/*.csv`; do python process_historical_values.py --filename $f --output_path /tmp/res --num_weeks 8; done
