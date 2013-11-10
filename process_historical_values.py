@@ -58,21 +58,24 @@ def main():
     cubic_poly.error = error
 
     # Plots.
-    plt.subplot(411)
+    plt.subplot(511)
     plt.title('Histogram of gradients') 
     util.PlotHistogram(slopes)
 
-    plt.subplot(412)
+    plt.subplot(512)
     plt.title('Value per week') 
     plt.plot(rev_week_values)
 
-    plt.subplot(413)
+    plt.subplot(513)
     plt.title('Quadratic fit')
     fitter.PlotPolynomial(poly_quadratic)
 
-    plt.subplot(414)
-    #plt.title('Cubic fit')
-    #fitter.PlotPolynomial(poly_cubic)
+    plt.subplot(514)
+    plt.title('Cubic fit')
+    fitter.PlotPolynomial(poly_cubic)
+
+    plt.subplot(515)
+    plt.title('Linear fit')
     fitter.PlotPolynomial(poly_linear)
 
     # Save.

@@ -5,3 +5,6 @@ First, get some historical data.
 
 python get_historical_data.py --filename config/symbols_little --output_path data/ --num_threads=10
 
+Process data to get polynomial models:
+
+python process_historical_values.py --filename data/CAM.L-2010-2013-week.csv --output_path /tmp/res
