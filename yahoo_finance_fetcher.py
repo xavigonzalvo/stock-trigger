@@ -52,4 +52,6 @@ class YahooFinanceFetcher(object):
                   'f': 'j1',
                   'e': '.csv'}
         info = self._GetData(self.__QUOTE_SERVER, values)
-        return float(re.findall("\d+.\d+", info)[0])
+        if 'N/A' not in info:
+            return float(re.findall("\d+.\d+", info)[0])
+        return None

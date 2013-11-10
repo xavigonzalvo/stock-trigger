@@ -82,7 +82,9 @@ def main():
     symbol = util.GetSymbolFromFilename(FLAGS.filename)
     print 'Processing "%s"' % symbol
     fetcher = YFetcher.YahooFinanceFetcher()
-    result.market_cap = fetcher.GetMarketCap(symbol)
+    market_cap = fetcher.GetMarketCap(symbol)
+    if market_cap:
+        result.market_cap = market_cap 
 
     # Fit model.
     rev_week_values = week_values[::-1]
