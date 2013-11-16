@@ -1,0 +1,11 @@
+#ÊSoft filter.
+
+name: "soft"
+min_mean: 0.1
+negative_gradient_variation: false
+
+min_linear_gradient: 1.0
+convex: true
+
+min_market_cap: 30
+max_market_cap: 350

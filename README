@@ -26,5 +26,5 @@ b) Multiple symbols in parallel:
 
 Filtering symbols:
 
-for f in res/*.res; do echo $f >> /tmp/res_list; done
-python filter_symbols.py --filename /tmp/res_list --output_path filter/
+for f in data/res/*.res; do echo $f >> /tmp/res_list; done
+python filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto

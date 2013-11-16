@@ -1,5 +1,7 @@
 """A set of utils."""
 
+from google.protobuf import text_format
+
 import os.path
 import matplotlib.pyplot as plt
 import numpy as np
@@ -37,3 +39,9 @@ def SafeReadLines(filename):
         for line in f.readlines():
             lines.append(line.strip())
     return lines
+
+
+def ReadTextProto(filename, proto):
+    """Reads a protobuf in text mode."""
+    with open(filename, 'r') as f:
+        text_format.Merge(f.read(), proto)

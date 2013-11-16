@@ -1,0 +1,18 @@
+// Filter definition.
+
+message Filter {
+  // Filter name.
+  optional string name = 1;
+
+  // Percentual change statistics.
+  optional double min_mean = 2;
+  optional bool negative_gradient_variation = 3;
+
+  // A list of polynomial filters.
+  optional double min_linear_gradient = 4;
+  optional bool convex = 5;
+
+  // Market capitalization in millions.
+  optional double min_market_cap = 6;
+  optional double max_market_cap = 7;
+}
