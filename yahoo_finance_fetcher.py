@@ -35,12 +35,13 @@ class YahooFinanceFetcher(object):
         Returns:
           A string containing the data.
         """
+        # Data is in month, day, year format. Note that month is 0-based.
         values = {'s': symbol,
-                  'a': 0,
+                  'a': 0,  # January
                   'b': 1,
                   'c': start_year,
-                  'd': 11,
-                  'e': 30,
+                  'd': 11,  # December
+                  'e': 31,
                   'f': end_year,
                   'g': period,
                   'ignore': '.csv'}
