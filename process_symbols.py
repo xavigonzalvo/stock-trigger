@@ -15,11 +15,14 @@ flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
                          help="Number of weeks. Starting from last")
 flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
                          help="Number of threads")
+flags.FLAGS.add_argument("--make_graphs", default=True,
+                         help="Generate graph of each symbol",
+                         action="store_true")
 FLAGS = flags.Parse()
 
 
-def ProcessorWorker(runner, filename, num_weeks, output_path):
-    runner.Run(filename, num_weeks, output_path)
+def ProcessorWorker(runner, filename, num_weeks, output_path, make_graphs):
+    runner.Run(filename, num_weeks, output_path, make_graphs)
 
 
 def main():
@@ -31,7 +34,7 @@ def main():
     runner = symbol_data_generator.Runner(lock)
     for data_file in data_files:
         pool.apply_async(ProcessorWorker, [runner, data_file, FLAGS.num_weeks,
-                                           FLAGS.output_path])
+                                           FLAGS.output_path, FLAGS.make_graphs])
     pool.close()
     pool.join()
 

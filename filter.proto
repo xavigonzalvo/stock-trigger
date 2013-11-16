@@ -13,6 +13,7 @@ message Filter {
   optional bool convex = 5;
 
   // Market capitalization in millions.
-  optional double min_market_cap = 6;
-  optional double max_market_cap = 7;
+  optional bool filter_if_no_market_cap = 6;
+  optional double min_market_cap = 7;
+  optional double max_market_cap = 8;
 }

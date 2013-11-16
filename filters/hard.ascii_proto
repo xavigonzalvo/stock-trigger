@@ -8,5 +8,6 @@ negative_gradient_variation: false
 min_linear_gradient: 1.0
 convex: true
 
+filter_if_no_market_cap: true
 min_market_cap: 30
 max_market_cap: 350

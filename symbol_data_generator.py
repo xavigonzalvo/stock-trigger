@@ -64,7 +64,7 @@ class Runner(object):
         #cubic_poly.error = error
         return (poly_quadratic, poly_cubic, poly_linear)
     
-    def Run(self, filename, num_weeks, output_path):
+    def Run(self, filename, num_weeks, output_path, make_graphs):
         # Read data.
         data = weeks_processor.ReadData(filename)
         total_num_weeks = len(data)
@@ -98,11 +98,12 @@ class Runner(object):
                               if num_weeks > 0 else 'all')
         # Save plots.
         output_figure_path = os.path.join(output_path, '%s.png' % filename)
-        with self.__lock:
-            self._MakePlots(rev_week_values, percentual_change, fitter,
-                            poly_quadratic, poly_cubic, poly_linear)
-            plt.savefig(output_figure_path)
-            plt.close('all')
+        if make_graphs:
+            with self.__lock:
+                self._MakePlots(rev_week_values, percentual_change, fitter,
+                                poly_quadratic, poly_cubic, poly_linear)
+                plt.savefig(output_figure_path)
+                plt.close('all')
     
         # Save result.
         output_result_path = os.path.join(output_path, '%s.res' % filename)

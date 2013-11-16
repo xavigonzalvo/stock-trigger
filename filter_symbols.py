@@ -26,9 +26,14 @@ def Filter(data, data_filter):
     Returns:
       True if the symbol has to be filtered out.
     """
-    if (data.market_cap < data_filter.min_market_cap or
-        data.market_cap > data_filter.max_market_cap):
-        return True
+    if data.HasField("market_cap"):
+        if (data.market_cap < data_filter.min_market_cap or
+            data.market_cap > data_filter.max_market_cap):
+            return True
+    else:
+        if data_filter.filter_if_no_market_cap:
+            return True
+
     if data.mean - data.std < 0 and not data_filter.negative_gradient_variation:
         return True  # mean variation can go negative
     if data.mean < data_filter.min_mean:

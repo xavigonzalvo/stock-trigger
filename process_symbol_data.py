@@ -16,7 +16,7 @@ FLAGS = flags.Parse()
 
 def main():
     runner = symbol_data_generator.Runner(Lock())
-    runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path)
+    runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path, True)
 
 if __name__ == "__main__":    
     main()
