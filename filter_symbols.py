@@ -20,26 +20,37 @@ flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
 FLAGS = flags.Parse()
 
 
-def FilterWorker(data_filter, filename, output_path):
-    data = week_result_pb2.WeekResult()
-    util.ReadTextProto(filename, data)
-    
+def Filter(data, data_filter):
+    """Decides whether to filter a symbol.
+
+    Returns:
+      True if the symbol has to be filtered out.
+    """
     if (data.market_cap < data_filter.min_market_cap or
         data.market_cap > data_filter.max_market_cap):
-        return
+        return True
     if data.mean - data.std < 0 and not data_filter.negative_gradient_variation:
-        return  # mean variation can go negative
+        return True  # mean variation can go negative
     if data.mean < data_filter.min_mean:
-        return  # if increases less than X% in average
+        return True  # if increases less than X% in average
     for poly in data.poly:
         if poly.order == 1:
             for coef in poly.coef:
                 if coef < data_filter.min_linear_gradient:
-                    return
+                    return True
                 break
         if poly.order == 2:
             if poly.convex != data_filter.convex:
-                return
+                return True
+    return False
+
+
+def FilterWorker(data_filter, filename, output_path):
+    data = week_result_pb2.WeekResult()
+    util.ReadTextProto(filename, data)
+    
+    if Filter(data, data_filter):
+        return
 
     # At this point, we have a good symbol.
     basename = util.Basename(filename)
