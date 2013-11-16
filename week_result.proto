@@ -15,7 +15,7 @@ message Polynomial {
 }
 
 message WeekResult {
-  // Gradient statistics.
+  // Percentual change statistics.
   optional double mean = 1;
   optional double std = 2;
 

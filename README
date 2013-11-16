@@ -21,10 +21,10 @@ a) One symbol:
 b) Multiple symbols in parallel:
 
    for f in `ls data/*.csv`; do echo $f; done > /tmp/list
-   python process_symbols.py --filename /tmp/list --num_weeks 10 --output_path /tmp/res/
+   python process_symbols.py --filename /tmp/list --num_weeks 10 --output_path res/
 
 
 Filtering symbols:
 
-for f in /tmp/res/*.res; do echo $f >> /tmp/c; done
-python filter_symbols.py --filename /tmp/c --output_path /tmp/filter
+for f in res/*.res; do echo $f >> /tmp/res_list; done
+python filter_symbols.py --filename /tmp/res_list --output_path filter/

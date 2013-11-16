@@ -24,6 +24,10 @@ def FilterWorker(filename, output_path):
         text_format.Merge(f.read(), data)
     if data.market_cap < 30 or data.market_cap > 350:
         return
+    if data.mean - data.std < 0:  # if mean variation can go negative
+        return
+    if data.mean < 0.1:  # if increases less than 3% in average
+        return
     for poly in data.poly:
         if poly.order == 1:
             for coef in poly.coef:
