@@ -39,8 +39,8 @@ class YahooFinanceFetcher(object):
                   'a': 0,
                   'b': 1,
                   'c': start_year,
-                  'd': 0,
-                  'e': 31,
+                  'd': 11,
+                  'e': 30,
                   'f': end_year,
                   'g': period,
                   'ignore': '.csv'}
