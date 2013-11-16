@@ -48,14 +48,25 @@ class WeeksProcessor(object):
         """Processes weeks and computes statistic indicators.
 
         Returns:
-          A tuple containing the slopes, week values, mean and std.
+          A tuple containing the percentual change per week, week
+          values, mean and std of percentual change per week. Values
+          have the latest first.
         """
-        slopes = []
+        percentual_changes = []
         week_values = []
-        for week in range(0, self.__num_weeks):
+        # Loop over all weeks + 1 in order to compute the gradient. Delete
+        # extra week value at the end.
+        for week in range(0, self.__num_weeks + 1):
+            # Week values.
             current_week = float(self.__data[week]['close'])
-            next_week = float(self.__data[week + 1]['close'])
-            slope = (current_week - next_week) / self._NUM_DAYS_IN_WEEK
-            slopes.append(slope)
             week_values.append(current_week)
-        return (slopes, week_values, np.mean(slopes), np.std(slopes))
+            
+            # Slopes.
+            if week > 0:
+                next_week = float(self.__data[week - 1]['close'])
+                change_in_a_week = (next_week - current_week) / self._NUM_DAYS_IN_WEEK
+                change_in_a_week_perc = change_in_a_week / current_week * 100
+                percentual_changes.append(change_in_a_week_perc)
+        del week_values[-1]
+        return (percentual_changes, week_values,
+                np.mean(percentual_changes), np.std(percentual_changes))

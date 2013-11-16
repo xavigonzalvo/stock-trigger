@@ -3,7 +3,14 @@ Trading tools
 
 First, get some historical data.
 
-python get_historical_data.py --filename config/symbols_little --output_path data/ --num_threads=10
+a) A list of symbols:
+
+   python get_historical_data.py --filename config/symbols_little --output_path data/ --num_threads=10
+
+b) A single symbol:
+
+    python get_historical_data.py --symbol GOOG --output_path data/ --overwrite
+
 
 Generating data to get polynomial models:
 

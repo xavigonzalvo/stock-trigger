@@ -16,10 +16,9 @@ def PlotHistogram(values):
     Args:
       values: a list of values.
     """
-    hist, bins = np.histogram(values,
-                              bins=np.arange(min(values) - 0.001,
-                                             max(values) + 0.001), density=True)
-    plt.bar(bins[:-1], hist, width = 1)
+    desired_bins = np.arange(min(values) - 0.001, max(values) + 0.001, 0.1)
+    hist, bins = np.histogram(values, bins=desired_bins, density=True)
+    plt.bar(bins[:-1], hist, width=0.1)
     plt.xlim(min(bins), max(bins))
     return plt.draw()
 

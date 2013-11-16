@@ -73,8 +73,8 @@ class Runner(object):
     
         # Process data.
         processor = weeks_processor.WeeksProcessor(data, num_weeks)
-        (slopes, week_values, mean, std) = processor.Process()
-    
+        (percentual_change, week_values, mean, std) = processor.Process()
+
         result = week_result_pb2.WeekResult()
         result.mean = mean
         result.std = std
@@ -90,7 +90,8 @@ class Runner(object):
         fitter = curve_fitting.CurveFitting(rev_week_values)
     
         # Update results.
-        (poly_quadratic, poly_cubic, poly_linear) = self._UpdateProto(fitter, result)
+        (poly_quadratic, poly_cubic, poly_linear) = self._UpdateProto(fitter,
+                                                                      result)
     
         # Save plots.
         filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
@@ -98,7 +99,7 @@ class Runner(object):
         # Save plots.
         output_figure_path = os.path.join(output_path, '%s.png' % filename)
         with self.__lock:
-            self._MakePlots(rev_week_values, slopes, fitter,
+            self._MakePlots(rev_week_values, percentual_change, fitter,
                             poly_quadratic, poly_cubic, poly_linear)
             plt.savefig(output_figure_path)
             plt.close('all')
