@@ -1,4 +1,4 @@
-#ÊSoft filter.
+# Soft filter.
 
 name: "soft"
 min_mean: 0.1
