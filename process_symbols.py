@@ -1,7 +1,7 @@
 """Process data of a list of symbols in parallel.
 """
 
-from multiprocessing import Pool, Lock, Manager
+from multiprocessing import Pool, Manager
 
 import flags
 import util
