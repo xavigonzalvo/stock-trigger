@@ -24,6 +24,8 @@ flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
                          help="Number of threads")
 flags.FLAGS.add_argument("--from_year", required=False, type=int, default=2010,
                          help="Get data from this year")
+flags.FLAGS.add_argument("--period", required=False, default='w',
+                         help="One of w (week) or d (day)")
 FLAGS = flags.Parse()
 
 
@@ -37,7 +39,7 @@ def FetcherWorker(fetcher, symbol):
     print 'Fetching %s ...' % symbol
     try:
         data = fetcher.GetHistorical(symbol, FLAGS.from_year,
-                                     current_year, 'w')
+                                     current_year, FLAGS.period)
     except YFetcher.YahooFinanceFetcherError, e:
         print e
         return

@@ -50,7 +50,10 @@ def Filter(data, data_filter):
     return False
 
 
-def FilterWorker(data_filter, filename, output_path):
+def FilterWorker(filter_serialized, filename, output_path):
+    data_filter = filter_pb2.Filter()
+    data_filter.ParseFromString(filter_serialized)
+
     data = week_result_pb2.WeekResult()
     util.ReadTextProto(filename, data)
     
@@ -67,13 +70,14 @@ def FilterWorker(data_filter, filename, output_path):
 def main():
     data_filter = filter_pb2.Filter()
     util.ReadTextProto(FLAGS.filter, data_filter)
+    filter_serialized = data_filter.SerializeToString()
     print data_filter
 
     data_files = util.SafeReadLines(FLAGS.filename)
     print 'Processing %d files' % len(data_files)
     pool = Pool(processes=FLAGS.num_threads)
     for data_file in data_files:
-        pool.apply_async(FilterWorker, [data_filter, data_file,
+        pool.apply_async(FilterWorker, [filter_serialized, data_file,
                                         FLAGS.output_path])
     pool.close()
     pool.join()

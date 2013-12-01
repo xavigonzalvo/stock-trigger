@@ -1,5 +1,5 @@
 # Soft filter.
-# #ÊThe mean percentual change minus the std can go below zero.
+# The mean percentual change minus the std can go below zero.
 
 name: "soft"
 min_mean: 0.1
