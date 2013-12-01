@@ -1,5 +1,7 @@
 # Soft filter.
-# # The mean percentual change minus the std can go below zero.
+# The mean percentual change minus the std can go below zero but it
+# filters penny shares by forcing second coefficient of linear
+# regression to be over 100.
 
 name: "soft"
 min_mean: 0.1

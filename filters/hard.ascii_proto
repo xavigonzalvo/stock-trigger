@@ -1,5 +1,5 @@
 # Hard filter.
-#ÊThe mean percentual change minus the std must not go below zero.
+# The mean percentual change minus the std must not go below zero.
 
 name: "hard"
 min_mean: 0.1
