@@ -32,3 +32,5 @@ Filtering symbols
 
 for f in data/res/*.res; do echo $f >> /tmp/res_list; done
 python filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto
+
+grep mean: data_days/filtered_medium/*.res | sort -k 2
