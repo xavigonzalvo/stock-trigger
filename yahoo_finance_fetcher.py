@@ -56,3 +56,12 @@ class YahooFinanceFetcher(object):
         if 'N/A' not in info:
             return float(re.findall("\d+.\d+", info)[0])
         return None
+
+    def GetName(self, symbol):
+        """Gets name."""
+        values = {'s': symbol,
+                  'f': 'n0',
+                  'e': '.csv'}
+        info = self._GetData(self.__QUOTE_SERVER, values)
+        return info.strip('\r\n"')
+    

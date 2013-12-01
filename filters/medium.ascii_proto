@@ -1,11 +1,12 @@
 # Soft filter.
-# #ÊThe mean percentual change minus the std can go below zero.
+# #Â The mean percentual change minus the std can go below zero.
 
 name: "soft"
 min_mean: 0.1
 negative_gradient_variation: true
 
 min_linear_gradient: 1.0
+min_linear_offset: 100.0
 convex: true
 
 filter_if_no_market_cap: false

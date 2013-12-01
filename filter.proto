@@ -10,10 +10,14 @@ message Filter {
 
   // A list of polynomial filters.
   optional double min_linear_gradient = 4;
-  optional bool convex = 5;
+  optional double min_linear_offset = 5;
+  optional bool convex = 6;
 
   // Market capitalization in millions.
-  optional bool filter_if_no_market_cap = 6;
-  optional double min_market_cap = 7;
-  optional double max_market_cap = 8;
+  optional bool filter_if_no_market_cap = 7;
+  optional double min_market_cap = 8;
+  optional double max_market_cap = 9;
+
+  // Filter names.
+  repeated string codeword = 10;
 }

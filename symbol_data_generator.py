@@ -65,6 +65,13 @@ class Runner(object):
         return (poly_quadratic, poly_cubic, poly_linear)
     
     def Run(self, filename, num_weeks, output_path, make_graphs):
+        # Save plots.
+        res_filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
+                                  if num_weeks > 0 else 'all')
+        # Output paths.
+        output_figure_path = os.path.join(output_path, '%s.png' % res_filename)
+        output_result_path = os.path.join(output_path, '%s.res' % res_filename)
+
         # Read data.
         data = weeks_processor.ReadData(filename)
         total_num_weeks = len(data)
@@ -83,8 +90,9 @@ class Runner(object):
         fetcher = YFetcher.YahooFinanceFetcher()
         market_cap = fetcher.GetMarketCap(symbol)
         if market_cap:
-            result.market_cap = market_cap 
-    
+            result.market_cap = market_cap
+        result.name = fetcher.GetName(symbol)
+
         # Fit model.
         rev_week_values = week_values[::-1]
         fitter = curve_fitting.CurveFitting(rev_week_values)
@@ -94,10 +102,6 @@ class Runner(object):
                                                                       result)
     
         # Save plots.
-        filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
-                              if num_weeks > 0 else 'all')
-        # Save plots.
-        output_figure_path = os.path.join(output_path, '%s.png' % filename)
         if make_graphs:
             with self.__lock:
                 self._MakePlots(rev_week_values, percentual_change, fitter,
@@ -106,6 +110,5 @@ class Runner(object):
                 plt.close('all')
     
         # Save result.
-        output_result_path = os.path.join(output_path, '%s.res' % filename)
         with open(output_result_path, 'w') as f:
             f.write(text_format.MessageToString(result))

@@ -15,7 +15,7 @@ flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
                          help="Number of weeks. Starting from last")
 flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
                          help="Number of threads")
-flags.FLAGS.add_argument("--make_graphs", default=True,
+flags.FLAGS.add_argument("--make_graphs", default=False,
                          help="Generate graph of each symbol",
                          action="store_true")
 FLAGS = flags.Parse()

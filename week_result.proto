@@ -24,4 +24,7 @@ message WeekResult {
 
   // Market capitalization in millions.
   optional double market_cap = 5;
+
+  // Name of the symbol.
+  optional string name = 6;
 }

@@ -26,6 +26,10 @@ def Filter(data, data_filter):
     Returns:
       True if the symbol has to be filtered out.
     """
+    for word in data_filter.codeword:
+        if word.lower() in data.name.lower():
+            return True
+
     if data.HasField("market_cap"):
         if (data.market_cap < data_filter.min_market_cap or
             data.market_cap > data_filter.max_market_cap):
@@ -40,10 +44,14 @@ def Filter(data, data_filter):
         return True  # if increases less than X% in average
     for poly in data.poly:
         if poly.order == 1:
-            for coef in poly.coef:
-                if coef < data_filter.min_linear_gradient:
-                    return True
-                break
+            if poly.coef[0] < data_filter.min_linear_gradient:
+                return True
+            if poly.coef[1] < data_filter.min_linear_offset:
+                return True
+            #for coef in poly.coef:
+            #    if coef < data_filter.min_linear_gradient:
+            #        return True
+            #    break
         if poly.order == 2:
             if poly.convex != data_filter.convex:
                 return True
