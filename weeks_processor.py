@@ -1,5 +1,26 @@
 import csv
 import numpy as np
+import StringIO 
+
+
+def ProcessData(fileresource):
+    """Process opened file resource and returns a list of week close values.
+
+    Args:
+      fileresource: file pointer
+    Returns:
+      A list of dictionaries, each containing a row of the CSV file.
+    """
+    reader = csv.reader(fileresource, delimiter=',')
+    data = []
+    header = []
+    for row in reader:
+        if not header:
+            header = [value.lower() for value in row]
+        else:
+            values = dict(zip(header, row))
+            data.append(values)
+    return data
 
 
 def ReadData(filename):
@@ -11,16 +32,7 @@ def ReadData(filename):
       A list of dictionaries, each containing a row of the CSV file.
     """
     with open(filename, 'rb') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        data = []
-        header = []
-        for row in reader:
-            if not header:
-                header = [value.lower() for value in row]
-            else:
-                values = dict(zip(header, row))
-                data.append(values)
-        return data
+        return ProcessData(csvfile)
 
 
 class WeeksProcessor(object):

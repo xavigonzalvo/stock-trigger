@@ -1,0 +1,16 @@
+application: deep-trading
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /.*
+  script: deep-trading.application
+
+libraries:
+- name: numpy
+  version: "latest"
+  
+builtins:
+- deferred: on
