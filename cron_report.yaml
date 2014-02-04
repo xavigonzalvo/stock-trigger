@@ -1,0 +1,7 @@
+cron:
+- description: Gets data for weekly stocks
+  url: /cron/weekly_best_stocks_process
+  schedule: every 10 minutes
+- description: Produce a weekly report with best symbols
+  url: /cron/weekly_best_stocks_report
+  schedule: every 10 minutes
