@@ -29,7 +29,8 @@ import filter_pb2
 import week_result_pb2
 
 
-_MAIL = 'xavigonzalvo@gmail.com, ele.barquero@gmail.com'
+_SENDER_MAIL = 'xavigonzalvo@gmail.com'
+_MAILS = ['xavigonzalvo@gmail.com, ele.barquero@gmail.com']
 _WEEKLY_REPORT_SUBJECT = 'Weekly report'
 _WEB_FINANCE = 'https://www.google.co.uk/finance'
 
@@ -197,8 +198,8 @@ def CreateReport(hard_data_filter, medium_data_filter):
 
 
 def SendReport(report, report_html):
-    message = mail.EmailMessage(sender=_MAIL, to=_MAIL,
-                            subject=_WEEKLY_REPORT_SUBJECT)
+    message = mail.EmailMessage(sender=_SENDER_MAIL, to=_MAILS,
+                                subject=_WEEKLY_REPORT_SUBJECT)
     message.body = report
     message.html = report_html
     message.send()
