@@ -1,4 +1,4 @@
-
+"""Defines utils to filter symbols."""
 
 def Filter(data, data_filter):
     """Decides whether to filter a symbol.

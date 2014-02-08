@@ -4,7 +4,7 @@ from multiprocessing import Pool
 import os
 import shutil
 
-import filter
+import filter_utils
 import filter_pb2
 import flags
 import util
@@ -28,7 +28,7 @@ def FilterWorker(filter_serialized, filename, output_path):
     data = week_result_pb2.WeekResult()
     util.ReadTextProto(filename, data)
     
-    if filter.Filter(data, data_filter):
+    if filter_utils.Filter(data, data_filter):
         return
 
     # At this point, we have a good symbol.

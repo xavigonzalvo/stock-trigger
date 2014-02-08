@@ -6,9 +6,9 @@ threadsafe: true
 
 handlers:
 - url: /cron/weekly_best_stocks_report
-  script: weekly_best_stocks.application
+  script: weekly_best_stocks_report.application
 - url: /cron/weekly_best_stocks_process
-  script: weekly_best_stocks.application
+  script: weekly_best_stocks_process.application
 - url: /.*
   script: deep-trading.application
 
