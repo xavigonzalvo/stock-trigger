@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 
 class ReportProperty(ndb.Model):
     # When the report was generated.
-    date = ndb.DateProperty(indexed=True)
+    date = ndb.DateTimeProperty(indexed=True)
 
     # Hard filtered good symbols.
     hard_good_symbols = ndb.StringProperty(repeated=True)
@@ -24,12 +24,12 @@ class ReportsProperty(ndb.Model):
     # Date when symbols were processed. When generating a report,
     # this is the date referring to when the data of the symbols
     # was generated. 
-    last = ndb.DateProperty()
+    last = ndb.DateTimeProperty()
 
 
 class AnalysisProperty(ndb.Model):
     # When the data was saved for this analysis.
-    date = ndb.DateProperty()
+    date = ndb.DateTimeProperty()
 
     # serialized protobuf
     data = ndb.BlobProperty()

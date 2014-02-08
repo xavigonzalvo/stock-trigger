@@ -2,7 +2,8 @@
 
 import gae_setup  # Needs to be first
 
-from datetime import date
+import datetime
+import cgi
 import StringIO
 import logging
 
@@ -73,7 +74,7 @@ def Worker(symbol, current_date, period, current_year, from_year,
 
 
 def ProcessSymbols(symbols, period, current_year, from_year, period_type):
-    current_date = date.today()
+    current_date = datetime.datetime.now()
     ndb_data.ReportsProperty(last = current_date).put()
     for symbol in symbols:
         deferred.defer(Worker, symbol, current_date, period, current_year,
@@ -87,12 +88,13 @@ class BestStocksProcess(webapp2.RequestHandler):
 
         test = self.request.get('test')
         if test:
-            symbols = gae_utils.SafeReadLines('config/symbols_test')
+            num = int(cgi.escape(self.request.get('test')))
+            symbols = gae_utils.SafeReadLines('config/symbols_test%d' % num)
         else:
             symbols = gae_utils.SafeReadLines('config/symbols_little')
         self.response.write('Processing %d symbols\n' % len(symbols))
 
-        current_year = date.today().year
+        current_year = datetime.date.today().year
         from_year = self.request.get('from_year')
         if not from_year:
             from_year = current_year - 2

@@ -82,7 +82,11 @@ class SymbolProcessor(object):
         self.count_total = report.count_total
 
     def CreateSummary(self, report):
-        return '%s' % report.date
+        percentage = 0.0
+        if report.count_total > 0:
+            percentage = len(report.hard_good_symbols) / float(report.count_total)
+        return '%s (total=%d, good=%.2f%%, ...)' % (report.date, report.count_total,
+                                                    percentage)
 
     def CreateReport(self):
         """Generates an HTML report given good symbols."""
@@ -129,7 +133,9 @@ class StocksReport(webapp2.RequestHandler):
         self.response.write('<h1>Reports</h1>')
         curs = Cursor(urlsafe=self.request.get('cursor'))
         reports, next_curs, more = (
-            ndb_data.ReportProperty.query().fetch_page(10, start_cursor=curs))
+            ndb_data.ReportProperty.query().
+            order(-ndb_data.ReportProperty.date).
+            fetch_page(10, start_cursor=curs))
         processor = SymbolProcessor()
         for report in reports:
             self.response.write('<p><a href="/stocks_report?date=%s">%s</a></p>' %
