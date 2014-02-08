@@ -1,3 +1,5 @@
+"""Class to process symbols in the GAE."""
+
 import urllib
 
 import filter_utils
@@ -19,6 +21,8 @@ class SymbolProcessor(object):
             self.report = ndb_data.ReportProperty()
             self.report.date = date
             return False
+        self.report.hard_good_symbols = []
+        self.report.medium_good_symbols = []
         return True
 
     def Save(self):
