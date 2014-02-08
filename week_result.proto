@@ -27,4 +27,7 @@ message WeekResult {
 
   // Name of the symbol.
   optional string name = 6;
+
+  // Mean share value.
+  optional double mean_value = 7;
 }

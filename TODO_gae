@@ -1,4 +1,3 @@
-- Add user authentification.
 - Review data structure to minimize reads and writes.
 - Have the list of symbols in the database to keep track of unknown symbols.
 
@@ -7,3 +6,5 @@ Done
 
 - Save reports.
 - Load reports
+- Add user auth.
+- Filter penny shares.

@@ -12,6 +12,8 @@ filter_if_no_market_cap: true
 min_market_cap: 30
 max_market_cap: 350
 
+min_value: 200  # GPX
+
 codeword: "ISHARES"
 codeword: "ETFS"
 codeword: "FOREIGN"

@@ -20,4 +20,7 @@ message Filter {
 
   // Filter names.
   repeated string codeword = 10;
+
+  // Minimum value of the share.
+  optional double min_value = 11;
 }

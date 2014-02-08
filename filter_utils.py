@@ -35,4 +35,8 @@ def Filter(data, data_filter):
         if poly.order == 2:
             if poly.convex != data_filter.convex:
                 return True
+
+    # Remove penny shares.
+    if data_filter.HasField('min_value') and data.HasField('mean_value'):
+        return data.mean_value < data_filter.min_value
     return False

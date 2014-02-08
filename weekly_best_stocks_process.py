@@ -35,7 +35,7 @@ def Worker(symbol, current_date, period, current_year, from_year,
 
     # Fit model.
     processor = weeks_processor.WeeksProcessor(csv_data, period)
-    (percentual_change, week_values, mean, std) = processor.Process()
+    (percentual_change, week_values, mean, std, mean_value) = processor.Process()
     rev_week_values = week_values[::-1]
     fitter = curve_fitting_numpy.CurveFittingNumpy(rev_week_values)
 
@@ -44,6 +44,7 @@ def Worker(symbol, current_date, period, current_year, from_year,
     result.mean = mean
     result.std = std
     result.name = symbol
+    result.mean_value = mean_value
 
     (poly, _) = fitter.Linear()
     linear_poly = result.poly.add()

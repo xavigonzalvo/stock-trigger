@@ -72,7 +72,7 @@ class WeeksProcessor(object):
             # Week values.
             current_week = float(self.__data[week]['close'])
             week_values.append(current_week)
-            
+
             # Slopes.
             if week > 0:
                 next_week = float(self.__data[week - 1]['close'])
@@ -81,4 +81,5 @@ class WeeksProcessor(object):
                 percentual_changes.append(change_in_a_week_perc)
         del week_values[-1]
         return (percentual_changes, week_values,
-                np.mean(percentual_changes), np.std(percentual_changes))
+                np.mean(percentual_changes), np.std(percentual_changes),
+                np.mean(week_values))
