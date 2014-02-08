@@ -1,5 +1,7 @@
 """Defines a server to process stocks."""
 
+import gae_setup  # Needs to be first
+
 from datetime import date
 import StringIO
 import logging
@@ -8,24 +10,12 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.api import mail
 import curve_fitting_numpy
-import gae_setup
 import ndb_data
+import gae_utils
 import yahoo_finance_fetcher as YFetcher
 import weeks_processor
 import week_result_pb2
 import webapp2
-
-
-def SafeReadLines(filename):
-    """Reads all lines from a file making.
-
-    It makes sure there are no spaces at the beginning and end.
-    """
-    lines = []
-    with open(filename) as f:
-        for line in f.readlines():
-            lines.append(line.strip())
-    return lines
 
 
 def Worker(symbol, current_date, period, current_year, from_year,
@@ -97,9 +87,9 @@ class BestStocksProcess(webapp2.RequestHandler):
 
         test = self.request.get('test')
         if test:
-            symbols = SafeReadLines('config/symbols_test')
+            symbols = gae_utils.SafeReadLines('config/symbols_test')
         else:
-            symbols = SafeReadLines('config/symbols_little')
+            symbols = gae_utils.SafeReadLines('config/symbols_little')
         self.response.write('Processing %d symbols\n' % len(symbols))
 
         current_year = date.today().year

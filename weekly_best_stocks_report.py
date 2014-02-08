@@ -1,14 +1,15 @@
 """Defines a server to generate weekly reports."""
 
+import gae_setup  # Needs to be first
+
 import urllib
 
-from google.protobuf import text_format
 from google.appengine.ext import deferred
 from google.appengine.api import mail
 import filter_utils
 import filter_pb2
 import gae_config
-import gae_setup
+import gae_utils
 import ndb_data
 import week_result_pb2
 import webapp2
@@ -73,12 +74,6 @@ def SendReport(report, report_html):
     message.send()
 
 
-def ReadTextProto(filename, proto):
-    """Reads a protobuf in text mode."""
-    with open(filename, 'r') as f:
-        text_format.Merge(f.read(), proto)
-
-
 class BestStocksReport(webapp2.RequestHandler):
 
     def get(self):
@@ -86,9 +81,9 @@ class BestStocksReport(webapp2.RequestHandler):
         self.response.write('Producing report ...<br><br>')
 
         hard_data_filter = filter_pb2.Filter()
-        ReadTextProto('filters/hard.ascii_proto', hard_data_filter)
+        gae_utils.ReadTextProto('filters/hard.ascii_proto', hard_data_filter)
         medium_data_filter = filter_pb2.Filter()
-        ReadTextProto('filters/medium.ascii_proto', medium_data_filter)
+        gae_utils.ReadTextProto('filters/medium.ascii_proto', medium_data_filter)
 
         report, report_html = CreateReport(hard_data_filter, medium_data_filter)
         SendReport(report, report_html)
