@@ -128,7 +128,8 @@ class StocksReport(webapp2.RequestHandler):
         # List of reports.
         self.response.write('<h1>Reports</h1>')
         curs = Cursor(urlsafe=self.request.get('cursor'))
-        reports, next_curs, more = ndb_data.ReportProperty.query().fetch_page(10, start_cursor=curs)  #.order(report.last)
+        reports, next_curs, more = (
+            ndb_data.ReportProperty.query().fetch_page(10, start_cursor=curs))
         processor = SymbolProcessor()
         for report in reports:
             self.response.write('<p><a href="/stocks_report?date=%s">%s</a></p>' %
@@ -142,7 +143,6 @@ class LastStocksReport(webapp2.RequestHandler):
 
     def get(self):
         self.response.headers['Content-Type'] = 'text/html'
-        self.response.write('Producing report ...<br><br>')
 
         # Generate report.
         report_info = ndb_data.ReportsProperty.query().get()
@@ -161,7 +161,6 @@ class LastStocksReport(webapp2.RequestHandler):
         SendReport(report_html)
 
         self.response.write(report_html)
-        self.response.write('<br>Finished')
 
 
 application = webapp2.WSGIApplication([
