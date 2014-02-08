@@ -1,12 +1,10 @@
 application: deep-trading
-version: 1
+version: 2
 runtime: python27
 api_version: 1
 threadsafe: true
 
 handlers:
-- url: /stocks_report
-  script: weekly_best_stocks_report.application
 - url: /cron/weekly_best_stocks_report
   script: weekly_best_stocks_report.application
 - url: /cron/weekly_best_stocks_process

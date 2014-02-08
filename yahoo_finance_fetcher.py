@@ -18,7 +18,7 @@ class YahooFinanceFetcher(object):
     def _GetData(self, server, values):
         try:
             data = urllib.urlencode(values)
-            resp = urllib2.urlopen('%s?%s' % (server, data))
+            resp = urllib2.urlopen('%s?%s' % (server, data), timeout=15)
             return resp.read()
         except urllib2.HTTPError:
             raise YahooFinanceFetcherError('Not found')

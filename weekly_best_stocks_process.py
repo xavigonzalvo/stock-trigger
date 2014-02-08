@@ -9,7 +9,6 @@ import logging
 
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
-from google.appengine.api import mail
 import curve_fitting_numpy
 import ndb_data
 import gae_utils
@@ -65,7 +64,7 @@ def Worker(symbol, current_date, period, current_year, from_year,
 
     symbol_db = ndb_data.SymbolProperty.query(ndb_data.SymbolProperty.name == symbol).get()
     analysis_db = ndb_data.AnalysisProperty(date=current_date,
-                                   data=result.SerializeToString())
+                                            data=result.SerializeToString())
     if not symbol_db:
         symbol_db = ndb_data.SymbolProperty(name=symbol, analysis=[analysis_db])
     else:
@@ -75,7 +74,11 @@ def Worker(symbol, current_date, period, current_year, from_year,
 
 def ProcessSymbols(symbols, period, current_year, from_year, period_type):
     current_date = datetime.datetime.now()
-    ndb_data.ReportsProperty(last = current_date).put()
+    report_info = ndb_data.ReportsProperty.query().get()
+    if not report_info:
+        report_info = ndb_data.ReportsProperty()
+    report_info.last = current_date
+    report_info.put()
     for symbol in symbols:
         deferred.defer(Worker, symbol, current_date, period, current_year,
                        from_year, period_type)
@@ -83,7 +86,7 @@ def ProcessSymbols(symbols, period, current_year, from_year, period_type):
 
 class BestStocksProcess(webapp2.RequestHandler):
 
-    def get(self):
+    def get(self):        
         self.response.headers['Content-Type'] = 'text/plain'
 
         test = self.request.get('test')
