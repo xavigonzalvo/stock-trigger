@@ -1,5 +1,4 @@
 from datetime import date
-import csv
 import StringIO
 
 import urllib
@@ -182,16 +181,19 @@ def CreateReport(hard_data_filter, medium_data_filter):
             break
         count_total += 1
 
-    msg = ['count_total = %d' % count_total,
+    msg = ['report last: %s' % report.last,
+           'count_total = %d' % count_total,
            'count_correct_analysis = %d' % count_correct_analysis,
            ] + hard_good_symbols_html
     hard_msg_symbols_html = ['%s<br>' % symbol for symbol in hard_good_symbols_html]
     medium_msg_symbols_html = ['%s<br>' % symbol for symbol in medium_good_symbols_html]
     msg_html = """<h2>Stats</h2>
-                  <p>count_total = %d<br>
+                  <p>Date: %s<br>
+                  count_total = %d<br>
                   count_correct_analysis = %d</p>
                   <h2>Hard filtered symbols</h2><p>%s</p>
                   <h2>Medium filtered symbols</h2><p>%s</p>""" % (
+        report.last,
         count_total, count_correct_analysis, "".join(hard_msg_symbols_html),
         "".join(medium_msg_symbols_html))    
     return '\n'.join(msg), msg_html
