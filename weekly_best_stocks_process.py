@@ -2,29 +2,18 @@
 
 from datetime import date
 import StringIO
-
 import logging
-import os
-import sys
 
-import google  # provided by GAE
-
-# add vendorized protobuf to google namespace package
-vendor_dir = os.path.join(os.path.dirname(__file__), 'vendor')
-google.__path__.append(os.path.join(vendor_dir, 'google'))
-
-# add vendor path
-sys.path.insert(0, vendor_dir)
-
-import curve_fitting_numpy
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
-import webapp2
 from google.appengine.api import mail
+import curve_fitting_numpy
+import gae_setup
+import ndb_data
 import yahoo_finance_fetcher as YFetcher
 import weeks_processor
 import week_result_pb2
-import ndb_data
+import webapp2
 
 
 def SafeReadLines(filename):

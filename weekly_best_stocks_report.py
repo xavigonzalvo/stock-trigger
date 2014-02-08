@@ -1,32 +1,17 @@
 """Defines a server to generate weekly reports."""
 
 import urllib
-import os
-import sys
-
-import google  # provided by GAE
-
-# add vendorized protobuf to google namespace package
-vendor_dir = os.path.join(os.path.dirname(__file__), 'vendor')
-google.__path__.append(os.path.join(vendor_dir, 'google'))
-
-# add vendor path
-sys.path.insert(0, vendor_dir)
 
 from google.protobuf import text_format
 from google.appengine.ext import deferred
-import webapp2
 from google.appengine.api import mail
 import filter_utils
 import filter_pb2
+import gae_config
+import gae_setup
 import ndb_data
 import week_result_pb2
-
-
-_SENDER_MAIL = 'xavigonzalvo@gmail.com'
-_MAILS = ['xavigonzalvo@gmail.com, ele.barquero@gmail.com']
-_WEEKLY_REPORT_SUBJECT = 'Weekly report'
-_WEB_FINANCE = 'https://www.google.co.uk/finance'
+import webapp2
 
 
 def CreateReport(hard_data_filter, medium_data_filter):
@@ -51,13 +36,13 @@ def CreateReport(hard_data_filter, medium_data_filter):
                 url_symbol = urllib.quote('LON:%s' % data.name.replace('.L',''))
                 hard_good_symbols_html.append(
                     '<a href="%s?q=%s&ei=HejzUoiYBavGwAPk8gE">%s</a><br>' % (
-                        _WEB_FINANCE, url_symbol, data.name))
+                        gae_config.WEB_FINANCE, url_symbol, data.name))
             if not filter_utils.Filter(data, medium_data_filter):
                 medium_good_symbols.append(data.name)
                 url_symbol = urllib.quote('LON:%s' % data.name.replace('.L',''))
                 medium_good_symbols_html.append(
                     '<a href="%s?q=%s&ei=HejzUoiYBavGwAPk8gE">%s</a><br>' % (
-                        _WEB_FINANCE, url_symbol, data.name))
+                        gae_config.WEB_FINANCE, url_symbol, data.name))
             break
         count_total += 1
 
@@ -80,8 +65,9 @@ def CreateReport(hard_data_filter, medium_data_filter):
 
 
 def SendReport(report, report_html):
-    message = mail.EmailMessage(sender=_SENDER_MAIL, to=_MAILS,
-                                subject=_WEEKLY_REPORT_SUBJECT)
+    message = mail.EmailMessage(sender=gae_config.SENDER_MAIL,
+                                to=gae_config.MAILS,
+                                subject=gae_config.WEEKLY_REPORT_SUBJECT)
     message.body = report
     message.html = report_html
     message.send()
