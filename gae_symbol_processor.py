@@ -21,8 +21,6 @@ class SymbolProcessor(object):
             self.report = ndb_data.ReportProperty()
             self.report.date = date
             return False
-        self.report.hard_good_symbols = []
-        self.report.medium_good_symbols = []
         return True
 
     def Save(self):
@@ -31,6 +29,8 @@ class SymbolProcessor(object):
     def FilterSymbols(self, hard_data_filter, medium_data_filter):
         """Filters symbols using filters. Uses the last date stored in
         report as the reference to pick values from stored symbols"""
+        self.report.hard_good_symbols = []
+        self.report.medium_good_symbols = []
         symbols = ndb_data.SymbolProperty.query()
         self.report.count_correct_analysis = 0
         self.report.count_total = 0
