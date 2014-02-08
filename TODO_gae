@@ -1,2 +1,3 @@
 - Save reports.
 - Add user authentification.
+- Review data structure to minize reads and writes.

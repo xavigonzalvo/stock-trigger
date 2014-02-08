@@ -5,6 +5,8 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /stocks_report
+  script: weekly_best_stocks_report.application
 - url: /cron/weekly_best_stocks_report
   script: weekly_best_stocks_report.application
 - url: /cron/weekly_best_stocks_process

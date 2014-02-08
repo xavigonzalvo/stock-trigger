@@ -74,7 +74,7 @@ def Worker(symbol, current_date, period, current_year, from_year,
 
 def ProcessSymbols(symbols, period, current_year, from_year, period_type):
     current_date = date.today()
-    ndb_data.ReportProperty(last = current_date).put()
+    ndb_data.ReportsProperty(last = current_date).put()
     for symbol in symbols:
         deferred.defer(Worker, symbol, current_date, period, current_year,
                        from_year, period_type)
