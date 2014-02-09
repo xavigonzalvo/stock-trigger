@@ -36,7 +36,7 @@ class LastStocksReport(webapp2.RequestHandler):
         # Regenerate report if it exists.
         report_info = ndb_data.ReportsProperty.query().get()
         processor = gae_symbol_processor.SymbolProcessor()
-        if processor.Load(report_info.last):
+        if report_info and processor.Load(report_info.last):
             self.response.write('<p>Regenerating report</p>')
 
         processor.FilterSymbols(hard_data_filter, medium_data_filter)

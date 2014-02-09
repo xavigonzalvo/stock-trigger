@@ -12,7 +12,7 @@ class SymbolProcessor(object):
     """Class to handle symbols, filter and generating reports."""
 
     def __init__(self):
-        self.report = None
+        self.report = ndb_data.ReportProperty()
 
     def Load(self, date):
         self.report = ndb_data.ReportProperty.query(
