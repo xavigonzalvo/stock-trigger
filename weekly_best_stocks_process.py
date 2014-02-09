@@ -34,29 +34,8 @@ def Worker(symbol, current_date, period, current_year, from_year,
     f.close()
 
     # Fit model.
-    processor = weeks_processor.WeeksProcessor(csv_data, period)
-    (percentual_change, week_values, mean, std, mean_value) = processor.Process()
-    rev_week_values = week_values[::-1]
-    fitter = curve_fitting_numpy.CurveFittingNumpy(rev_week_values)
-
-    # Store result.
-    result = week_result_pb2.WeekResult()
-    result.mean = mean
-    result.std = std
-    result.name = symbol
-    result.mean_value = mean_value
-
-    (poly, _) = fitter.Linear()
-    linear_poly = result.poly.add()
-    linear_poly.order = 1
-    linear_poly.coef.extend(list(poly))
-    
-    poly, error, convex = fitter.Quadratic()
-    quadratic_poly = result.poly.add()
-    quadratic_poly.order = 2
-    quadratic_poly.coef.extend(list(poly))
-    quadratic_poly.error = error
-    quadratic_poly.convex = convex
+    processor = weeks_processor.WeeksProcessor(csv_data, period, symbol)
+    result = processor.PolynomialModel()
     
     fetcher = YFetcher.YahooFinanceFetcher()
     market_cap = fetcher.GetMarketCap(symbol)

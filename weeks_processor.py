@@ -4,6 +4,9 @@ import csv
 import numpy as np
 import StringIO 
 
+import curve_fitting_numpy
+import week_result_pb2
+
 
 def ProcessData(fileresource):
     """Process opened file resource and returns a list of week close values.
@@ -39,7 +42,7 @@ def ReadData(filename):
 
 class WeeksProcessor(object):
 
-    def __init__(self, data, num_weeks):
+    def __init__(self, data, num_weeks, symbol):
         """Constructor.
 
         Args:
@@ -50,6 +53,7 @@ class WeeksProcessor(object):
         self._NUM_DAYS_IN_WEEK = 5  # only working days
         self.__data = data
         self.__num_weeks = self._GetNumWeeks(num_weeks)
+        self.__symbol = symbol
         
     def _GetNumWeeks(self, num_weeks):
         if num_weeks <= 0:
@@ -58,7 +62,7 @@ class WeeksProcessor(object):
             num_weeks = min(num_weeks, len(self.__data) - 1)
         return num_weeks
 
-    def Process(self):
+    def _Process(self):
         """Processes weeks and computes statistic indicators.
 
         Returns:
@@ -88,3 +92,36 @@ class WeeksProcessor(object):
                 np.mean(percentage_changes_per_day),
                 np.std(percentage_changes_per_day),
                 np.mean(week_values))
+
+    def PolynomialModel(self):
+        """Models data using polynomial models.
+
+        Returns:
+          week_result_pb2.WeekResult
+        """
+        (percentage_change_per_day, week_values,
+         mean, std, mean_value) = self._Process()
+
+        rev_week_values = week_values[::-1]
+        fitter = curve_fitting_numpy.CurveFittingNumpy(rev_week_values)
+
+        # Store result.
+        result = week_result_pb2.WeekResult()
+        result.mean = mean
+        result.std = std
+        result.name = self.__symbol
+        result.mean_value = mean_value
+
+        (poly, _) = fitter.Linear()
+        linear_poly = result.poly.add()
+        linear_poly.order = 1
+        linear_poly.coef.extend(list(poly))
+    
+        poly, error, convex = fitter.Quadratic()
+        quadratic_poly = result.poly.add()
+        quadratic_poly.order = 2
+        quadratic_poly.coef.extend(list(poly))
+        quadratic_poly.error = error
+        quadratic_poly.convex = convex
+
+        return result
