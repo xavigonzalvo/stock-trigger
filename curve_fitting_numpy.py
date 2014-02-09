@@ -1,3 +1,5 @@
+"""Curve fitting module using numpy."""
+
 import numpy as np
 
 

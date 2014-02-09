@@ -1,3 +1,5 @@
+"""Process data of a stock extracting weekly information."""
+
 import csv
 import numpy as np
 import StringIO 
@@ -41,10 +43,11 @@ class WeeksProcessor(object):
         """Constructor.
 
         Args:
-          data: values for each week in reverse order (ie. latest first)
+          data: a dictionary of values for each week in reverse
+                order (ie. latest first)
           num_weeks: number of weeks to analyse from latest week
         """
-        self._NUM_DAYS_IN_WEEK = 5
+        self._NUM_DAYS_IN_WEEK = 5  # only working days
         self.__data = data
         self.__num_weeks = self._GetNumWeeks(num_weeks)
         
@@ -53,33 +56,35 @@ class WeeksProcessor(object):
             num_weeks = len(self.__data) - 1
         else:
             num_weeks = min(num_weeks, len(self.__data) - 1)
-        print "Analyzing %d weeks" % num_weeks
         return num_weeks
 
     def Process(self):
         """Processes weeks and computes statistic indicators.
 
         Returns:
-          A tuple containing the percentual change per week, week
-          values, mean and std of percentual change per week. Values
+          A tuple containing the percentage change per day, week
+          values, mean and std of percetange change per day. Values
           have the latest first.
         """
-        percentual_changes = []
+        percentage_changes_per_day = []
         week_values = []
         # Loop over all weeks + 1 in order to compute the gradient. Delete
         # extra week value at the end.
         for week in range(0, self.__num_weeks + 1):
             # Week values.
-            current_week = float(self.__data[week]['close'])
-            week_values.append(current_week)
+            current_week_value = float(self.__data[week]['close'])
+            week_values.append(current_week_value)
 
             # Slopes.
             if week > 0:
-                next_week = float(self.__data[week - 1]['close'])
-                change_in_a_week = (next_week - current_week) / self._NUM_DAYS_IN_WEEK
-                change_in_a_week_perc = change_in_a_week / current_week * 100
-                percentual_changes.append(change_in_a_week_perc)
+                next_week_value = float(self.__data[week - 1]['close'])
+                change_per_day = (next_week_value -
+                                  current_week_value) / self._NUM_DAYS_IN_WEEK
+                percentage_change_per_day = (
+                    change_per_day / current_week_value * 100)
+                percentage_changes_per_day.append(percentage_change_per_day)
         del week_values[-1]
-        return (percentual_changes, week_values,
-                np.mean(percentual_changes), np.std(percentual_changes),
+        return (percentage_changes_per_day, week_values,
+                np.mean(percentage_changes_per_day),
+                np.std(percentage_changes_per_day),
                 np.mean(week_values))
