@@ -8,6 +8,8 @@ def SecondOrderRoot(poly):
     a = poly.coef[0]
     b = poly.coef[1]
     c = poly.coef[2]
+    if 4 * a * c > b * b:
+        return 0.0
     return - b + math.sqrt(b * b - 4 * a * c) / (2 * a)
 
 
