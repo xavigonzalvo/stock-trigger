@@ -1,5 +1,16 @@
 """Defines utils to filter symbols."""
 
+import math
+
+
+def SecondOrderRoot(poly):
+    """Returns the positive root of a 2nd-order polynomial."""
+    a = poly.coef[0]
+    b = poly.coef[1]
+    c = poly.coef[2]
+    return - b + math.sqrt(b * b - 4 * a * c) / (2 * a)
+
+
 def Filter(data, data_filter):
     """Decides whether to filter a symbol.
 
@@ -35,8 +46,12 @@ def Filter(data, data_filter):
         if poly.order == 2:
             if poly.convex != data_filter.convex:
                 return True
+            if (data_filter.HasField('x_convex_poly') and
+                SecondOrderRoot(poly) < data_filter.x_convex_poly):
+                return True
 
     # Remove penny shares.
     if data_filter.HasField('min_value') and data.HasField('mean_value'):
         return data.mean_value < data_filter.min_value
+
     return False

@@ -9,12 +9,10 @@ import logging
 
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
-import curve_fitting_numpy
 import ndb_data
 import gae_utils
 import yahoo_finance_fetcher as YFetcher
 import weeks_processor
-import week_result_pb2
 import webapp2
 
 

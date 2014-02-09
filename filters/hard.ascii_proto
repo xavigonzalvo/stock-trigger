@@ -14,6 +14,8 @@ max_market_cap: 350
 
 min_value: 200  # GPX
 
+x_convex_poly: 0.6
+
 codeword: "ISHARES"
 codeword: "ETFS"
 codeword: "FOREIGN"
