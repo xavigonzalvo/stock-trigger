@@ -1,4 +1,4 @@
-"""Definitions of data user by the deep-trading system."""
+"""Definitions of data used by the deep-trading system."""
 
 from google.appengine.ext import ndb
 
