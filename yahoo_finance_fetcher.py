@@ -27,7 +27,7 @@ class YahooFinanceFetcher(object):
                 'Failed to process query "%s"' % data)
 
     def GetAllSymbols(self):
-        """Gets all symbols using a YQL request."""
+        """Gets all LSE symbols using a YQL request."""
         values = {
             'q': ('select * from yahoo.finance.industry '
                   'where id in (select industry.id from '
@@ -44,7 +44,9 @@ class YahooFinanceFetcher(object):
             if 'company' in item:
                 for company in item['company']:
                     if type(company) == dict:
-                        companies.append(company['symbol'])
+                        symbol = company['symbol']
+                        if '.L' in symbol:
+                            companies.append(symbol)
                     else:
                         print company
             else:
