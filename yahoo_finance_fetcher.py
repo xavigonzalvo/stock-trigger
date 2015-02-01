@@ -1,5 +1,6 @@
 """Library to fetch information from Yahoo."""
 
+import json
 import urllib
 import urllib2
 import re
@@ -14,6 +15,7 @@ class YahooFinanceFetcher(object):
     def __init__(self):
         self.__HISTORICAL_SERVER = 'http://ichart.yahoo.com/table.csv'
         self.__QUOTE_SERVER = 'http://download.finance.yahoo.com/d/quotes.csv'
+        self.__YQL_SERVER = 'http://query.yahooapis.com/v1/public/yql'
 
     def _GetData(self, server, values):
         try:
@@ -21,7 +23,33 @@ class YahooFinanceFetcher(object):
             resp = urllib2.urlopen('%s?%s' % (server, data), timeout=15)
             return resp.read()
         except urllib2.HTTPError:
-            raise YahooFinanceFetcherError('Not found')
+            raise YahooFinanceFetcherError(
+                'Failed to process query "%s"' % data)
+
+    def GetAllSymbols(self):
+        """Gets all symbols using a YQL request."""
+        values = {
+            'q': ('select * from yahoo.finance.industry '
+                  'where id in (select industry.id from '
+                  'yahoo.finance.sectors)'),
+            'env': 'store://datatables.org/alltableswithkeys',
+            'format': 'json',
+        }
+        # TODO(xavigonzalvo): there are some cases where the data
+        # doesn't match
+        data = json.loads(self._GetData(self.__YQL_SERVER, values))
+        industries = data['query']['results']['industry']
+        companies = []
+        for item in industries:
+            if 'company' in item:
+                for company in item['company']:
+                    if type(company) == dict:
+                        companies.append(company['symbol'])
+                    else:
+                        print company
+            else:
+                print item
+        return companies        
 
     def GetHistorical(self, symbol, start_year, end_year, period):
         """Gets historical values.
