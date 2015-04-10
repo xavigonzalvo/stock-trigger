@@ -15,7 +15,7 @@ virtualenv:
 before_install:
   - wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz
   - tar -xvzf protobuf-2.6.1.tar.gz
-  - cd protobuf-2.6.1
+  - cd protobuf-2.6.1/python
   - python setup.py build
   - python setup.py google_test
   - pip install matplotlib
