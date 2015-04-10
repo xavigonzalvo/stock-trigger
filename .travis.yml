@@ -4,16 +4,20 @@ python:
 notifications:
   email: false
 
-virtualenv:
-  system_site_packages: true
-  
-install:
-  - pip install --use-mirrors matplotlib
+#virtualenv:
+#  system_site_packages: true
+#install:
+#  - pip install --use-mirrors matplotlib
+#before_install:
+#  - pip install numpy
+#  - pip install scipy
 
 before_install:
-  - pip install numpy
-  - pip install scipy
- 
+  - sudo apt-get -qq update
+  - sudo apt-get -qq install python-numpy python-scipy
+install:
+   - "pip install -r requirements.txt --use-mirrors"
+
 script:
   - python curve_fitting_test.py
   - python weeks_processor_test.py
