@@ -1,5 +1,7 @@
 # Trading tools
 
+[![Build Status](https://travis-ci.org/xavigonzalvo/stock-trigger.svg)](https://travis-ci.org/xavigonzalvo/stock-trigger)
+
 Trading tools refer to utilities that can be used to process stock
 symbols. Stocks in any market are charaterized by a symbol (ie. name)
 and some historical data. The following tools take historical data and
