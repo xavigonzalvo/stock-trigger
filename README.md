@@ -1,6 +1,16 @@
 Trading tools
 =============
 
+Trading tools refer to utilities that can be used to process stock
+symbols. Stocks in any market are charaterized by a symbol (ie. name)
+and some historical data. The following tools take historical data and
+builds a simple regression model to find interesting companies in the
+market.
+
+There are two parts in this repository. One the one hand, scripts to
+run locally and process historical data of stock symbols. On the other
+hand, an AppEngine frontend to run this functionality automatically.
+
 Build
 -----
 
@@ -28,12 +38,12 @@ Get some historical data
 Generating data to get polynomial models
 ----------------------------------------
 
-a) Multiple symbols in parallel:
+* Multiple symbols in parallel:
 
-   for f in `ls data/*.csv`; do echo $f; done > /tmp/list
-   python process_symbols.py --filename /tmp/list --num_weeks 10 --output_path data/res/ --num_threads=10
+        $ for f in `ls data/csv/*.csv`; do echo $f; done > /tmp/list
+        $ ./process_symbols.py --filename /tmp/list --num_weeks 10 --output_path data/res/ --num_threads=10
    
-b) One symbol:
+* One symbol:
 
    python process_symbol_data.py --filename data/CAM.L-2010-2013-week.csv --output_path data/res --num_weeks 8
 

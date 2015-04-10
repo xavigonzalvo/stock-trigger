@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import os
 
 import curve_fitting
+import logging
+import protos.week_result_pb2 as week_result_pb2
 import util
 import weeks_processor
-import week_result_pb2
 import yahoo_finance_fetcher as YFetcher
 
 
@@ -75,8 +76,8 @@ class Runner(object):
         # Read data.
         data = weeks_processor.ReadData(filename)
         total_num_weeks = len(data)
-        print '%d weeks for analysis (%d months, %d years)' % (
-            total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12)
+        logging.info('%d weeks for analysis (%d months, %d years)' % (
+            total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12))
     
         # Process data.
         processor = weeks_processor.WeeksProcessor(data, num_weeks)
@@ -86,7 +87,7 @@ class Runner(object):
         result.mean = mean
         result.std = std
         symbol = util.GetSymbolFromFilename(filename)
-        print 'Processing "%s"' % symbol
+        logging.info('Processing "%s"' % symbol)
         fetcher = YFetcher.YahooFinanceFetcher()
         market_cap = fetcher.GetMarketCap(symbol)
         if market_cap:
