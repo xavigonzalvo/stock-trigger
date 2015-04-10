@@ -17,7 +17,7 @@ class WeeksProcessorTest(unittest.TestCase):
 
     def testProcess(self):
         (perc_change, week_values, mean, std,
-         mean_values) = self.runner._Process()
+         mean_values) = self.runner.Process()
         self.assertEquals([10.0, 9.0, 8.0, 7.0], week_values)
         self.assertEquals(week_values[0],
                           week_values[1] + week_values[1] *
