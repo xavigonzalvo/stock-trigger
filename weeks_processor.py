@@ -5,7 +5,7 @@ import numpy as np
 import StringIO 
 
 import curve_fitting_numpy
-import week_result_pb2
+import protos.week_result_pb2 as week_result_pb2
 
 
 def ProcessData(fileresource):

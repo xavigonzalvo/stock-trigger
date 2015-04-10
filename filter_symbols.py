@@ -5,10 +5,10 @@ import os
 import shutil
 
 import filter_utils
-import filter_pb2
 import flags
 import util
-import week_result_pb2
+import protos.filter_pb2 as filter_pb2
+import protos.week_result_pb2 as week_result_pb2
 
 flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
