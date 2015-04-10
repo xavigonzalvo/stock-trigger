@@ -1,27 +1,28 @@
 Trading tools
 =============
 
-Install
--------
+Build
+-----
 
-Update protocol buffers (more information on protocol buffers can be
-found here https://github.com/google/protobuf).
+Install python and protocol buffers (more information on protocol
+buffers can be found here https://github.com/google/protobuf).
 
-  ```
-  $ cd build
-  $ ./update_protos.sh
-  ```
+Build protocol buffers for this project:
+
+    $ cd build
+    $ ./update_protos.sh
 
 Get some historical data
 ------------------------ 
 
-a) A list of symbols:
+* From a list of stocks:
 
-   python get_historical_data.py --filename config/symbols --output_path data/csv --num_threads=10
+        $ mkdir -p data/csv
+        $ ./get_historical_data.py --filename config/symbols_little --output_path data/csv --num_threads=10
 
-b) A single symbol:
+* A single symbol:
 
-   python get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
+        $ python get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
 
 
 Generating data to get polynomial models
@@ -41,7 +42,12 @@ b) One symbol:
 Filtering symbols
 -----------------
 
-for f in data/res/*.res; do echo $f >> /tmp/res_list; done
-python filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto
+In order to filter information of a set of stock symbols, you can do
+it locally too:
 
-grep mean: data_days/filtered_medium/*.res | sort -k 2
+    $ for f in data/res/*.res; do echo $f >> /tmp/res_list; done
+    $ python filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto
+
+You can see the mean:
+
+    $ grep mean: data_days/filtered_medium/*.res | sort -k 2
