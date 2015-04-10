@@ -1,6 +1,17 @@
 Trading tools
 =============
 
+Install
+-------
+
+Update protocol buffers (more information on protocol buffers can be
+found here https://github.com/google/protobuf).
+
+  ```
+  $ cd build
+  $ ./update_protos.sh
+  ```
+
 Get some historical data
 ------------------------ 
 
