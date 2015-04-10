@@ -42,13 +42,14 @@ def ReadData(filename):
 
 class WeeksProcessor(object):
 
-    def __init__(self, data, num_weeks, symbol):
+    def __init__(self, data, num_weeks, symbol=""):
         """Constructor.
 
         Args:
           data: a dictionary of values for each week in reverse
                 order (ie. latest first)
           num_weeks: number of weeks to analyse from latest week
+          symbol: only used by the polynomial model function
         """
         self._NUM_DAYS_IN_WEEK = 5  # only working days
         self.__data = data
@@ -62,7 +63,7 @@ class WeeksProcessor(object):
             num_weeks = min(num_weeks, len(self.__data) - 1)
         return num_weeks
 
-    def _Process(self):
+    def Process(self):
         """Processes weeks and computes statistic indicators.
 
         Returns:
@@ -100,7 +101,7 @@ class WeeksProcessor(object):
           week_result_pb2.WeekResult
         """
         (percentage_change_per_day, week_values,
-         mean, std, mean_value) = self._Process()
+         mean, std, mean_value) = self.Process()
 
         rev_week_values = week_values[::-1]
         fitter = curve_fitting_numpy.CurveFittingNumpy(rev_week_values)

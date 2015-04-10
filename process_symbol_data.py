@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """Tool to process information extracted from get_historical_data."""
 
 from multiprocessing import Lock

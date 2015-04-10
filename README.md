@@ -32,6 +32,7 @@ Get some historical data
 
 * A single symbol:
 
+        $ mkdir -p data/csv
         $ ./get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
 
 
@@ -40,13 +41,14 @@ Generating data to get polynomial models
 
 * Multiple symbols in parallel:
 
+        $ mkdir data/res
         $ for f in `ls data/csv/*.csv`; do echo $f; done > /tmp/list
         $ ./process_symbols.py --filename /tmp/list --num_weeks 10 --output_path data/res/ --num_threads=10
    
 * One symbol:
 
-   python process_symbol_data.py --filename data/CAM.L-2010-2013-week.csv --output_path data/res --num_weeks 8
-
+        $ mkdir data/res
+        $ ./process_symbol_data.py --filename data/csv/CINE.L-2010-2015-week.csv --output_path data/res --num_weeks 8
 
 
 Filtering symbols

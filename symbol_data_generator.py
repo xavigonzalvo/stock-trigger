@@ -81,7 +81,7 @@ class Runner(object):
     
         # Process data.
         processor = weeks_processor.WeeksProcessor(data, num_weeks)
-        (percentual_change, week_values, mean, std) = processor.Process()
+        (percentual_change, week_values, mean, std, _) = processor.Process()
 
         result = week_result_pb2.WeekResult()
         result.mean = mean
