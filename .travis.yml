@@ -16,9 +16,10 @@ before_install:
   - wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz
   - tar -xvzf protobuf-2.6.1.tar.gz
   - cd protobuf-2.6.1
-  - ./configure && make install
+  - ./configure && sudo make install
   - cd python
   - python setup.py build
+  - python setup.py install
   - python setup.py google_test
   - pip install matplotlib
   - sudo apt-get -qq update
