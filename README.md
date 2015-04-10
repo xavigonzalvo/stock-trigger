@@ -22,7 +22,7 @@ Get some historical data
 
 * A single symbol:
 
-        $ python get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
+        $ ./get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
 
 
 Generating data to get polynomial models

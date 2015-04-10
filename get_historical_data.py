@@ -69,7 +69,8 @@ def main():
         chunks = [symbols[x:x+chunk_size]
                   for x in xrange(0, len(symbols), chunk_size)]
     else:
-        chunks = symbols
+        chunk_size = 1
+        chunks = [symbols]
     print 'chunks: %d, chunk size: %d' % (len(chunks), chunk_size)
     for i in range(len(chunks)):
         pool.apply_async(FetcherWorker, [i, fetcher, chunks[i]])
