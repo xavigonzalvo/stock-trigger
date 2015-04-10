@@ -8,10 +8,11 @@ virtualenv:
   system_site_packages: true
   
 install:
-  - "pip install -r requirements.txt --use-mirrors"
+  - pip install --use-mirrors matplotlib
 
 before_install:
-  - sudo apt-get install -qq python-numpy python-scipy
+  - pip install numpy
+  - pip install scipy
  
 script:
   - python curve_fitting_test.py
