@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """Filters a list of symbols in parallel."""
 
 from multiprocessing import Pool

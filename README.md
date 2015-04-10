@@ -1,5 +1,4 @@
-Trading tools
-=============
+# Trading tools
 
 Trading tools refer to utilities that can be used to process stock
 symbols. Stocks in any market are charaterized by a symbol (ie. name)
@@ -11,8 +10,7 @@ There are two parts in this repository. One the one hand, scripts to
 run locally and process historical data of stock symbols. On the other
 hand, an AppEngine frontend to run this functionality automatically.
 
-Build
------
+## Build
 
 Install python and protocol buffers (more information on protocol
 buffers can be found here https://github.com/google/protobuf).
@@ -22,8 +20,9 @@ Build protocol buffers for this project:
     $ cd build
     $ ./update_protos.sh
 
-Get some historical data
------------------------- 
+## Local tools
+
+### Get some historical data
 
 * From a list of stocks:
 
@@ -36,8 +35,7 @@ Get some historical data
         $ ./get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
 
 
-Generating data to get polynomial models
-----------------------------------------
+### Generating data to get polynomial models
 
 * Multiple symbols in parallel:
 
@@ -51,15 +49,23 @@ Generating data to get polynomial models
         $ ./process_symbol_data.py --filename data/csv/CINE.L-2010-2015-week.csv --output_path data/res --num_weeks 8
 
 
-Filtering symbols
------------------
+### Filtering symbols
 
 In order to filter information of a set of stock symbols, you can do
 it locally too:
 
+    $ mkdir data/filtered
     $ for f in data/res/*.res; do echo $f >> /tmp/res_list; done
-    $ python filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto
+    $ ./filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto
 
-You can see the mean:
+You can look at the mean percentage changes over the number of weeks
+each symbol has been processed for:
 
-    $ grep mean: data_days/filtered_medium/*.res | sort -k 2
+    $  grep mean: data/filtered/*.res | sort -k 2
+
+## AppEngine
+
+TODO:
+
+- Review data structure to minimize reads and writes.
+- Have the list of symbols in the database to keep track of unknown symbols.
