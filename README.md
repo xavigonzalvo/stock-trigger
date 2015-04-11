@@ -67,6 +67,15 @@ each symbol has been processed for:
 
 ## AppEngine
 
+An AppEngine frontend can be found in the `gae/` folder. First of all,
+please install the python tools from
+https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python.
+
+You can start the server by doing the following:
+
+    $ cd gae
+    $ ./start_server.sh
+
 TODO:
 
 - Review data structure to minimize reads and writes.

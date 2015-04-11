@@ -5,7 +5,7 @@ import urllib
 import filter_utils
 import gae_config
 import ndb_data
-import week_result_pb2
+import protos.week_result_pb2 as week_result_pb2
 
 
 class SymbolProcessor(object):

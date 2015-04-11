@@ -4,11 +4,11 @@ import gae_setup  # Needs to be first
 
 from google.appengine.ext import deferred
 from google.appengine.api import mail
-import filter_pb2
 import gae_config
-import gae_utils
 import gae_symbol_processor
+import gae_utils
 import ndb_data
+import protos.filter_pb2 as filter_pb2
 import webapp2
     
 
