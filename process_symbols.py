@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """Process data of a list of symbols in parallel.
 
   for f in `ls data/csv/*.csv`; do echo $f; done > /tmp/list

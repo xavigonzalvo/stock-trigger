@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """Parallel tool to get historical information of a list of symbols.
 
   <tool> --filename <symbols> --output_path <output>
