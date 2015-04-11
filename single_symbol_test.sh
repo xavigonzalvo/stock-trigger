@@ -4,8 +4,8 @@
 
 set -e
 
-readonly csv_dir=`mktemp -d -t dir`
-readonly res_dir=`mktemp -d -t dir`
+readonly csv_dir=`mktemp -d dir.XXXX`
+readonly res_dir=`mktemp -d dir.XXXX`
 readonly filelist=`mktemp -t list`
 
 die() { echo "$@" 1>&2 ; exit 1; }

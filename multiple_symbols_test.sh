@@ -4,11 +4,11 @@
 
 set -e
 
-readonly csv_dir=`mktemp -d -t dir`
-readonly res_dir=`mktemp -d -t dir`
-readonly filtered_dir=`mktemp -d -t dir`
-readonly filelist=`mktemp -t list`
-readonly res_list=`mktemp -t list`
+readonly csv_dir=`mktemp -d dir.XXXX`
+readonly res_dir=`mktemp -d dir.XXXX`
+readonly filtered_dir=`mktemp -d dir.XXXX`
+readonly filelist=`mktemp list.XXXX`
+readonly res_list=`mktemp list.XXXX`
 
 die() { echo "$@" 1>&2 ; exit 1; }
 
