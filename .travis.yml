@@ -21,6 +21,7 @@ before_install:
   - python setup.py build
   - sudo python setup.py install
   #- python setup.py test
+  - cd ../..
   - pip install matplotlib
   - sudo apt-get -qq update
   - sudo apt-get -qq install python-numpy python-scipy
