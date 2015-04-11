@@ -76,6 +76,8 @@ You can start the server by doing the following:
     $ cd gae
     $ ./start_server.sh
 
+Then you can visit http://localhost:8080 for testing locally.
+
 TODO:
 
 - Review data structure to minimize reads and writes.
