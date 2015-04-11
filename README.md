@@ -80,7 +80,7 @@ Then you can visit http://localhost:8080 for testing locally.
 
 You can have a look at a running instance of this AppEngine here:
 
-    http://deep-trading.appspot.com/
+http://deep-trading.appspot.com/
 
 Note that this will only let you look at the previous reports.
 
