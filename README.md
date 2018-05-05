@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/xavigonzalvo/stock-trigger.svg)](https://travis-ci.org/xavigonzalvo/stock-trigger)
 
 Trading tools refer to utilities that can be used to process stock
-symbols. Stocks in any market are charaterized by a symbol (ie. name)
+symbols. Stocks in any market are characterized by a symbol (ie. name)
 and some historical data. The following tools take historical data and
 builds a simple regression model to find interesting companies in the
 market.
@@ -44,7 +44,7 @@ Build protocol buffers for this project:
         $ mkdir data/res
         $ for f in `ls data/csv/*.csv`; do echo $f; done > /tmp/list
         $ ./process_symbols.py --filename /tmp/list --num_weeks 10 --output_path data/res/ --num_threads=10
-   
+
 * One symbol:
 
         $ mkdir data/res
