@@ -20,3 +20,4 @@ libraries:
   
 builtins:
 - deferred: on
+- remote_api: on
