@@ -32,7 +32,7 @@ import logging
 import protos.week_result_pb2 as week_result_pb2
 import util
 import weeks_processor
-import yahoo_finance_fetcher as YFetcher
+import alpha_advantage_fetcher as finance_fetcher
 
 
 class Runner(object):
@@ -43,23 +43,23 @@ class Runner(object):
     def _MakePlots(self, rev_week_values, slopes, fitter,
                    poly_quadratic, poly_cubic, poly_linear):
         plt.subplot(411)
-        plt.title('Histogram of gradients') 
+        plt.title('Histogram of gradients')
         util.PlotHistogram(slopes)
-    
+
         plt.subplot(412)
         plt.title('Value per week')
         plt.plot(rev_week_values)
-    
+
         plt.subplot(413)
         plt.title('Quadratic fit')
         fitter.PlotPolynomial(poly_quadratic)
-    
+
         # TODO(xavigonzalvo): this is disabled as still trying to
         # figure out what information can be extracted from cubic.
         #plt.subplot(514)
         #plt.title('Cubic fit')
         #fitter.PlotPolynomial(poly_cubic)
-    
+
         plt.subplot(414)
         plt.title('Linear fit')
         fitter.PlotPolynomial(poly_linear)
@@ -70,14 +70,14 @@ class Runner(object):
         linear_poly.order = 1
         linear_poly.coef.extend(list(poly_linear))
         linear_poly.error = error
-    
+
         poly_quadratic, error, convex = fitter.Quadratic()
         quadratic_poly = result.poly.add()
         quadratic_poly.order = 2
         quadratic_poly.coef.extend(list(poly_quadratic))
         quadratic_poly.error = error
         quadratic_poly.convex = convex
-    
+
         # TODO(xavigonzalvo): this is disabled as still trying to
         # figure out what information can be extracted from cubic.
         poly_cubic = None
@@ -87,7 +87,7 @@ class Runner(object):
         #cubic_poly.coef.extend(list(poly_cubic))
         #cubic_poly.error = error
         return (poly_quadratic, poly_cubic, poly_linear)
-    
+
     def Run(self, filename, num_weeks, output_path, make_graphs):
         # Save plots.
         res_filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
@@ -101,7 +101,7 @@ class Runner(object):
         total_num_weeks = len(data)
         logging.info('%d weeks for analysis (%d months, %d years)' % (
             total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12))
-    
+
         # Process data.
         processor = weeks_processor.WeeksProcessor(data, num_weeks)
         (percentual_change, week_values, mean, std, _) = processor.Process()
@@ -111,7 +111,7 @@ class Runner(object):
         result.std = std
         symbol = util.GetSymbolFromFilename(filename)
         logging.info('Processing "%s"' % symbol)
-        fetcher = YFetcher.YahooFinanceFetcher()
+        fetcher = finance_fetcher.FinanceFetcher()
         market_cap = fetcher.GetMarketCap(symbol)
         if market_cap:
             result.market_cap = market_cap
@@ -120,11 +120,11 @@ class Runner(object):
         # Fit model.
         rev_week_values = week_values[::-1]
         fitter = curve_fitting.CurveFitting(rev_week_values)
-    
+
         # Update results.
         (poly_quadratic, poly_cubic, poly_linear) = self._UpdateProto(fitter,
                                                                       result)
-    
+
         # Save plots.
         if make_graphs:
             with self.__lock:
@@ -132,7 +132,7 @@ class Runner(object):
                                 poly_quadratic, poly_cubic, poly_linear)
                 plt.savefig(output_figure_path)
                 plt.close('all')
-    
+
         # Save result.
         with open(output_result_path, 'w') as f:
             f.write(text_format.MessageToString(result))

@@ -25,7 +25,7 @@ SOFTWARE.
 
 import csv
 import numpy as np
-import StringIO 
+from io import StringIO
 
 import curve_fitting_numpy
 import protos.week_result_pb2 as week_result_pb2
@@ -59,7 +59,7 @@ def ReadData(filename):
     Returns:
       A list of dictionaries, each containing a row of the CSV file.
     """
-    with open(filename, 'rb') as csvfile:
+    with open(filename, 'rt') as csvfile:
         return ProcessData(csvfile)
 
 
@@ -78,7 +78,7 @@ class WeeksProcessor(object):
         self.__data = data
         self.__num_weeks = self._GetNumWeeks(num_weeks)
         self.__symbol = symbol
-        
+
     def _GetNumWeeks(self, num_weeks):
         if num_weeks <= 0:
             num_weeks = len(self.__data) - 1
@@ -140,7 +140,7 @@ class WeeksProcessor(object):
         linear_poly = result.poly.add()
         linear_poly.order = 1
         linear_poly.coef.extend(list(poly))
-    
+
         poly, error, convex = fitter.Quadratic()
         quadratic_poly = result.poly.add()
         quadratic_poly.order = 2

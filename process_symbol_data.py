@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Tool to process information extracted from get_historical_data.
 
 The MIT License (MIT)
@@ -42,5 +42,5 @@ def main():
     runner = symbol_data_generator.Runner(Lock())
     runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path, True)
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     main()
