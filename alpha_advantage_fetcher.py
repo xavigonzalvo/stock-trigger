@@ -36,7 +36,7 @@ class Error(Exception):
 
 class FinanceFetcher(object):
 
-    def __init__(self):
+    def __init__(self, api_key):
         self._SERVER = 'https://www.alphavantage.co/query'
         self._TIME_SERIES = {
             'd': 'TIME_SERIES_DAILY',
@@ -48,7 +48,7 @@ class FinanceFetcher(object):
             'w': 'Weekly Time Series',
             'm': 'Monthly Time Series'
         }
-        self._API_KEY = 'HSKGB919G1MDCID3'
+        self._api_key = api_key
 
     def _GetData(self, values, period):
         """Returns the json representation of the data in the given period.
@@ -62,7 +62,7 @@ class FinanceFetcher(object):
         """
         try:
             values['function'] = self._TIME_SERIES[period]
-            values['apikey'] = self._API_KEY
+            values['apikey'] = self._api_key
             values = urllib.parse.urlencode(values)
             req = '{}?{}'.format(self._SERVER, values)
             with urllib.request.urlopen(req, timeout=15) as response:

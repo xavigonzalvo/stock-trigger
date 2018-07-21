@@ -36,6 +36,8 @@ import alpha_advantage_fetcher as finance_fetcher
 
 flags.FLAGS.add_argument("--symbol", required=False,
                          help="A single symbol")
+flags.FLAGS.add_argument("--api_key", required=True,
+                         help="Key for the API service")
 flags.FLAGS.add_argument("--filename", required=False,
                          help="Path to the list of symbols")
 flags.FLAGS.add_argument("--output_path", required=True,
@@ -76,7 +78,7 @@ def main():
         symbols = util.SafeReadLines(FLAGS.filename)
 
     print ('%d symbols to fetch' % len(symbols))
-    fetcher = finance_fetcher.FinanceFetcher()
+    fetcher = finance_fetcher.FinanceFetcher(FLAGS.api_key)
     fetch_data(worker_id=0, fetcher=fetcher, symbols=symbols)
     print ('Processed %d symbols' % len(symbols))
 
