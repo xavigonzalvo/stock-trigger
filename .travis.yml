@@ -18,7 +18,7 @@ before_install:
   - cd ../..
   - pip install matplotlib
   - sudo apt-get -qq update
-  - sudo apt-get -qq install python-numpy python-scipy
+  - sudo apt-get -qq install python-numpy python-scipy python-tk
 
 script:
   - python curve_fitting_test.py
