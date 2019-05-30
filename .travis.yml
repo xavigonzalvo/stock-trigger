@@ -19,9 +19,11 @@ before_install:
   - pip install matplotlib
   - sudo apt-get -qq update
   - sudo apt-get -qq install python-numpy python-scipy python-tk
+  - cd build
+  - ./update_protos.sh
 
 script:
   - python curve_fitting_test.py
   - python weeks_processor_test.py
-  - ./single_symbol_test.sh
-  - ./multiple_symbols_test.sh
+  #- ./single_symbol_test.sh
+  #- ./multiple_symbols_test.sh
