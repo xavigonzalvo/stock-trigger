@@ -8,19 +8,21 @@ virtualenv:
   system_site_packages: true
 
 before_install:
-  - wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
-  - tar -xvzf protobuf-2.5.0.tar.gz
-  - cd protobuf-2.5.0
-  - ./configure && sudo make install
-  - cd python
-  - python setup.py build
-  - sudo python setup.py install
-  - cd ../..
+  #- wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+  #- tar -xvzf protobuf-2.5.0.tar.gz
+  #- cd protobuf-2.5.0
+  #- ./configure && sudo make install
+  #- cd python
+  #- python setup.py build
+  #- sudo python setup.py install
+  #- cd ../..
   - pip install matplotlib
   - sudo apt-get -qq update
   - sudo apt-get -qq install python-numpy python-scipy python-tk
+  - sudo apt install protobuf-compiler
   - cd build
   - ./update_protos.sh
+  - cd ..
 
 script:
   - python curve_fitting_test.py
