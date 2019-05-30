@@ -37,8 +37,9 @@ import alpha_advantage_fetcher as finance_fetcher
 
 class Runner(object):
 
-    def __init__(self, lock):
-        self.__lock = lock
+    def __init__(self, lock, iexcloud_token):
+        self._lock = lock
+        self._iexcloud_token = iexcloud_token
 
     def _MakePlots(self, rev_week_values, slopes, fitter,
                    poly_quadratic, poly_cubic, poly_linear):
@@ -111,7 +112,8 @@ class Runner(object):
         result.std = std
         symbol = util.GetSymbolFromFilename(filename)
         logging.info('Processing "%s"' % symbol)
-        fetcher = finance_fetcher.FinanceFetcher()
+        fetcher = finance_fetcher.FinanceFetcher(
+          iexcloud_token=self._iexcloud_token)
         market_cap = fetcher.GetMarketCap(symbol)
         if market_cap:
             result.market_cap = market_cap
@@ -127,7 +129,7 @@ class Runner(object):
 
         # Save plots.
         if make_graphs:
-            with self.__lock:
+            with self._lock:
                 self._MakePlots(rev_week_values, percentual_change, fitter,
                                 poly_quadratic, poly_cubic, poly_linear)
                 plt.savefig(output_figure_path)

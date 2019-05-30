@@ -36,7 +36,7 @@ class Error(Exception):
 
 class FinanceFetcher(object):
 
-    def __init__(self, api_key):
+    def __init__(self, api_key=None, iexcloud_token=None):
         self._SERVER = 'https://www.alphavantage.co/query'
         self._TIME_SERIES = {
             'd': 'TIME_SERIES_DAILY',
@@ -49,6 +49,8 @@ class FinanceFetcher(object):
             'm': 'Monthly Time Series'
         }
         self._api_key = api_key
+        self._IEXCLOUD_SERVER = 'https://cloud.iexapis.com'
+        self._iexcloud_token = iexcloud_token
 
     def _GetData(self, values, period):
         """Returns the json representation of the data in the given period.
@@ -68,11 +70,11 @@ class FinanceFetcher(object):
             with urllib.request.urlopen(req, timeout=15) as response:
                 data = json.loads(response.read())
                 time_series_key = self._KEY_TIME_SERIES[period]
-                weekly_data = data[time_series_key]
-                sorted(weekly_data, key=lambda k: k, reverse=False)
+                time_data = data[time_series_key]
+                sorted(time_data, key=lambda k: k, reverse=False)
                 data = []
-                for key, value in weekly_data.items():
-                    data.append(value['4. close'])
+                for _, values_per_period in time_data.items():
+                    data.append(values_per_period['4. close'])
                 return data
         except urllib.error.HTTPError as e:
             raise Error('Failed to process query "{}" with error {}'.format(
@@ -125,21 +127,16 @@ class FinanceFetcher(object):
         return '\n'.join(data)
 
     def GetMarketCap(self, symbol):
-      raise NotImplemented("Missing for AlphaAdvantage")
-    #     """Gets market capitalization in millions."""
-    #     values = {'s': symbol,
-    #               'f': 'j1',
-    #               'e': '.csv'}
-    #     info = self._GetData(self._QUOTE_SERVER, values)
-    #     if 'N/A' not in info:
-    #         return float(re.findall("\d+.\d+", info)[0])
-    #     return None
-    #
-    def GetName(self, symbol):
-      raise NotImplemented("Missing for AlphaAdvantage")
-    #     """Gets name."""
-    #     values = {'s': symbol,
-    #               'f': 'n0',
-    #               'e': '.csv'}
-    #     info = self._GetData(self._QUOTE_SERVER, values)
-    #     return info.strip('\r\n"')
+      values = {
+        'token': self._iexcloud_token,
+      }
+      values = urllib.parse.urlencode(values)
+      info = {
+        'url': self._IEXCLOUD_SERVER,
+        'symbol': symbol,
+        'values': values
+      }
+      req = '{url}/stable/stock/{symbol}/stats?{values}'.format(**info)
+      with urllib.request.urlopen(req, timeout=15) as response:
+        data = json.loads(response.read())
+        return data['marketcap']

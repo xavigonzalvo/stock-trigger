@@ -1,5 +1,7 @@
 // Model of a value. Information is organized by weeks.
 
+syntax = "proto2";
+
 message Polynomial {
   // For linear = 1, quadratic = 2, etc.
   required int32 order = 1;

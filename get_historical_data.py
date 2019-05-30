@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 """Tool to get historical information of a list of symbols.
 
   <tool> --filename <symbols> --output_path <output>
@@ -48,7 +48,7 @@ flags.FLAGS.add_argument("--overwrite",
 flags.FLAGS.add_argument("--from_year", required=False, type=int, default=2010,
                          help="Get data from this year")
 flags.FLAGS.add_argument("--period", required=False, default='w',
-                         help="One of w (week) or d (day)")
+                         help="One of m (month, w (week) or d (day)")
 FLAGS = flags.Parse()
 
 
@@ -57,7 +57,7 @@ def fetch_data(worker_id, fetcher, symbols):
     for i in range(len(symbols)):
         symbol = symbols[i]
         current_year = date.today().year
-        filename = '%s-%d-%d-week.csv' % (symbol, FLAGS.from_year, current_year)
+        filename = '%s-%d-%d.csv' % (symbol, FLAGS.from_year, current_year)
         output = os.path.join(FLAGS.output_path, filename)
         if os.path.exists(output) and not FLAGS.overwrite:
             continue

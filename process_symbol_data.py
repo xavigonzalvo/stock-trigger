@@ -35,12 +35,16 @@ flags.FLAGS.add_argument("--output_path", required=True,
                          help="Output folder")
 flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
                          help="Number of weeks to process. Starting from last")
+flags.FLAGS.add_argument("--iexcloud_token", required=True,
+                         help="iexcloud token")
 FLAGS = flags.Parse()
 
 
 def main():
-    runner = symbol_data_generator.Runner(Lock())
+    runner = symbol_data_generator.Runner(Lock(),
+                                          iexcloud_token=FLAGS.iexcloud_token)
     runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path, True)
+
 
 if __name__ == "__main__":
     main()

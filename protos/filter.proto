@@ -1,5 +1,7 @@
 // Filter definition.
 
+syntax = "proto2";
+
 message Filter {
   // Filter name.
   optional string name = 1;

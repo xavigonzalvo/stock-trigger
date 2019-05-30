@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Process data of a list of symbols in parallel.
 
   for f in `ls data/csv/*.csv`; do echo $f; done > /tmp/list
@@ -84,5 +84,5 @@ def main():
         print 'Processed %d files' % len(data_files)
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     main()
