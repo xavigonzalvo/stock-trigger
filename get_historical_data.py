@@ -32,7 +32,7 @@ import time
 
 import flags
 import util
-import alpha_advantage_fetcher as finance_fetcher
+import finance_fetcher
 
 flags.FLAGS.add_argument("--symbol", required=False,
                          help="A single symbol")
@@ -53,35 +53,35 @@ FLAGS = flags.Parse()
 
 
 def fetch_data(worker_id, fetcher, symbols):
-    """Worker to fetch symbol information."""
-    for i in range(len(symbols)):
-        symbol = symbols[i]
-        current_year = date.today().year
-        filename = '%s-%d-%d.csv' % (symbol, FLAGS.from_year, current_year)
-        output = os.path.join(FLAGS.output_path, filename)
-        if os.path.exists(output) and not FLAGS.overwrite:
-            continue
-        try:
-            data = fetcher.GetHistorical(symbol, FLAGS.from_year,
-                                         current_year, FLAGS.period)
-        except finance_fetcher.Error as e:
-            pass
-        with open(output, 'w') as f:
-            f.write(data)
-    print ('Worker %d processed %d symbols' % (worker_id, len(symbols)))
+  """Worker to fetch symbol information."""
+  for i in range(len(symbols)):
+    symbol = symbols[i]
+    current_year = date.today().year
+    filename = '%s-%d-%d.csv' % (symbol, FLAGS.from_year, current_year)
+    output = os.path.join(FLAGS.output_path, filename)
+    if os.path.exists(output) and not FLAGS.overwrite:
+      continue
+    try:
+      data = fetcher.GetHistorical(symbol, FLAGS.from_year,
+                                   current_year, FLAGS.period)
+    except finance_fetcher.Error as e:
+      pass
+    with open(output, 'w') as f:
+      f.write(data)
+  print ('Worker %d processed %d symbols' % (worker_id, len(symbols)))
 
 
 def main():
-    if FLAGS.symbol:
-        symbols = [FLAGS.symbol]
-    else:
-        symbols = util.SafeReadLines(FLAGS.filename)
+  if FLAGS.symbol:
+    symbols = [FLAGS.symbol]
+  else:
+    symbols = util.SafeReadLines(FLAGS.filename)
 
-    print ('%d symbols to fetch' % len(symbols))
-    fetcher = finance_fetcher.FinanceFetcher(FLAGS.api_key)
-    fetch_data(worker_id=0, fetcher=fetcher, symbols=symbols)
-    print ('Processed %d symbols' % len(symbols))
+  print ('%d symbols to fetch' % len(symbols))
+  fetcher = finance_fetcher.FinanceFetcher(FLAGS.api_key)
+  fetch_data(worker_id=0, fetcher=fetcher, symbols=symbols)
+  print ('Processed %d symbols' % len(symbols))
 
 
 if __name__ == '__main__':
-    main()
+  main()

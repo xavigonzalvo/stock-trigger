@@ -23,118 +23,121 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from google.protobuf import text_format
 import matplotlib.pyplot as plt
+import json
 import os
 
 import curve_fitting
 import logging
-import protos.week_result_pb2 as week_result_pb2
 import util
 import weeks_processor
-import alpha_advantage_fetcher as finance_fetcher
+import finance_fetcher
 
 
 class Runner(object):
 
-    def __init__(self, lock, iexcloud_token):
-        self._lock = lock
-        self._iexcloud_token = iexcloud_token
+  def __init__(self, lock, iexcloud_token):
+    self._lock = lock
+    self._iexcloud_token = iexcloud_token
 
-    def _MakePlots(self, rev_week_values, slopes, fitter,
-                   poly_quadratic, poly_cubic, poly_linear):
-        plt.subplot(411)
-        plt.title('Histogram of gradients')
-        util.PlotHistogram(slopes)
+  def _MakePlots(self, rev_week_values, slopes, fitter,
+                 poly_quadratic, poly_cubic, poly_linear):
+    plt.subplot(411)
+    plt.title('Histogram of gradients')
+    util.PlotHistogram(slopes)
 
-        plt.subplot(412)
-        plt.title('Value per week')
-        plt.plot(rev_week_values)
+    plt.subplot(412)
+    plt.title('Value per week')
+    plt.plot(rev_week_values)
 
-        plt.subplot(413)
-        plt.title('Quadratic fit')
-        fitter.PlotPolynomial(poly_quadratic)
+    plt.subplot(413)
+    plt.title('Quadratic fit')
+    fitter.PlotPolynomial(poly_quadratic)
 
-        # TODO(xavigonzalvo): this is disabled as still trying to
-        # figure out what information can be extracted from cubic.
-        #plt.subplot(514)
-        #plt.title('Cubic fit')
-        #fitter.PlotPolynomial(poly_cubic)
+    # TODO(xavigonzalvo): this is disabled as still trying to
+    # figure out what information can be extracted from cubic.
+    #plt.subplot(514)
+    #plt.title('Cubic fit')
+    #fitter.PlotPolynomial(poly_cubic)
 
-        plt.subplot(414)
-        plt.title('Linear fit')
-        fitter.PlotPolynomial(poly_linear)
+    plt.subplot(414)
+    plt.title('Linear fit')
+    fitter.PlotPolynomial(poly_linear)
 
-    def _UpdateProto(self, fitter, result):
-        poly_linear, error = fitter.Linear()
-        linear_poly = result.poly.add()
-        linear_poly.order = 1
-        linear_poly.coef.extend(list(poly_linear))
-        linear_poly.error = error
+  def _Update(self, fitter, result):
+    if "poly" not in result:
+      result["poly"] = []
 
-        poly_quadratic, error, convex = fitter.Quadratic()
-        quadratic_poly = result.poly.add()
-        quadratic_poly.order = 2
-        quadratic_poly.coef.extend(list(poly_quadratic))
-        quadratic_poly.error = error
-        quadratic_poly.convex = convex
+    poly_linear, error = fitter.Linear()
+    linear_poly = {}
+    linear_poly["order"] = 1
+    linear_poly["coef"] = list(poly_linear)
+    linear_poly["error"] = error
+    result["poly"].append(linear_poly)
 
-        # TODO(xavigonzalvo): this is disabled as still trying to
-        # figure out what information can be extracted from cubic.
-        poly_cubic = None
-        #poly_cubic, error = fitter.Cubic()
-        #cubic_poly = result.poly.add()
-        #cubic_poly.order = 3
-        #cubic_poly.coef.extend(list(poly_cubic))
-        #cubic_poly.error = error
-        return (poly_quadratic, poly_cubic, poly_linear)
+    poly_quadratic, error, convex = fitter.Quadratic()
+    quadratic_poly = {}
+    quadratic_poly["order"] = 2
+    quadratic_poly["coef"] = list(poly_quadratic)
+    quadratic_poly["error"] = error
+    quadratic_poly["convex"] = convex
+    result["poly"].append(quadratic_poly)
 
-    def Run(self, filename, num_weeks, output_path, make_graphs):
-        # Save plots.
-        res_filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
-                                  if num_weeks > 0 else 'all')
-        # Output paths.
-        output_figure_path = os.path.join(output_path, '%s.png' % res_filename)
-        output_result_path = os.path.join(output_path, '%s.res' % res_filename)
+    # TODO(xavigonzalvo): this is disabled as still trying to
+    # figure out what information can be extracted from cubic.
+    poly_cubic = None
+    #poly_cubic, error = fitter.Cubic()
+    #cubic_poly = result.poly.add()
+    #cubic_poly.order = 3
+    #cubic_poly.coef.extend(list(poly_cubic))
+    #cubic_poly.error = error
+    return (poly_quadratic, poly_cubic, poly_linear)
 
-        # Read data.
-        data = weeks_processor.ReadData(filename)
-        total_num_weeks = len(data)
-        logging.info('%d weeks for analysis (%d months, %d years)' % (
-            total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12))
+  def Run(self, filename, num_weeks, output_path, make_graphs):
+    # Save plots.
+    res_filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
+                              if num_weeks > 0 else 'all')
+    # Output paths.
+    output_figure_path = os.path.join(output_path, '%s.png' % res_filename)
+    output_result_path = os.path.join(output_path, '%s.res' % res_filename)
 
-        # Process data.
-        processor = weeks_processor.WeeksProcessor(data, num_weeks)
-        (percentual_change, week_values, mean, std, _) = processor.Process()
+    # Read data.
+    data = weeks_processor.ReadData(filename)
+    total_num_weeks = len(data)
+    logging.info('%d weeks for analysis (%d months, %d years)' % (
+        total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12))
 
-        result = week_result_pb2.WeekResult()
-        result.mean = mean
-        result.std = std
-        symbol = util.GetSymbolFromFilename(filename)
-        logging.info('Processing "%s"' % symbol)
-        fetcher = finance_fetcher.FinanceFetcher(
-          iexcloud_token=self._iexcloud_token)
-        market_cap = fetcher.GetMarketCap(symbol)
-        if market_cap:
-            result.market_cap = market_cap
-        result.name = fetcher.GetName(symbol)
+    # Process data.
+    processor = weeks_processor.WeeksProcessor(data, num_weeks)
+    (percentual_change, week_values, mean, std, _) = processor.Process()
 
-        # Fit model.
-        rev_week_values = week_values[::-1]
-        fitter = curve_fitting.CurveFitting(rev_week_values)
+    result = {}
+    result["mean"] = mean
+    result["std"] = std
+    symbol = util.GetSymbolFromFilename(filename)
+    logging.info('Processing "%s"' % symbol)
+    fetcher = finance_fetcher.FinanceFetcher(
+        iexcloud_token=self._iexcloud_token)
+    market_cap = fetcher.GetMarketCap(symbol)
+    if market_cap:
+      result["market_cap"] = market_cap / 1e6
+    result["name"] = fetcher.GetName(symbol)
 
-        # Update results.
-        (poly_quadratic, poly_cubic, poly_linear) = self._UpdateProto(fitter,
-                                                                      result)
+    # Fit model.
+    rev_week_values = week_values[::-1]
+    fitter = curve_fitting.CurveFitting(rev_week_values)
 
-        # Save plots.
-        if make_graphs:
-            with self._lock:
-                self._MakePlots(rev_week_values, percentual_change, fitter,
-                                poly_quadratic, poly_cubic, poly_linear)
-                plt.savefig(output_figure_path)
-                plt.close('all')
+    # Update results.
+    (poly_quadratic, poly_cubic, poly_linear) = self._Update(fitter, result)
 
-        # Save result.
-        with open(output_result_path, 'w') as f:
-            f.write(text_format.MessageToString(result))
+    # Save plots.
+    if make_graphs:
+      with self._lock:
+        self._MakePlots(rev_week_values, percentual_change, fitter,
+                        poly_quadratic, poly_cubic, poly_linear)
+        plt.savefig(output_figure_path)
+        plt.close('all')
+
+    # Save result.
+    with open(output_result_path, 'wt') as f:
+      json.dump(result, f)

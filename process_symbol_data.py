@@ -41,10 +41,10 @@ FLAGS = flags.Parse()
 
 
 def main():
-    runner = symbol_data_generator.Runner(Lock(),
-                                          iexcloud_token=FLAGS.iexcloud_token)
-    runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path, True)
+  runner = symbol_data_generator.Runner(Lock(),
+                                        iexcloud_token=FLAGS.iexcloud_token)
+  runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path, True)
 
 
 if __name__ == "__main__":
-    main()
+  main()

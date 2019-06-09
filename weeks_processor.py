@@ -28,7 +28,6 @@ import numpy as np
 from io import StringIO
 
 import curve_fitting_numpy
-import protos.week_result_pb2 as week_result_pb2
 
 
 def ProcessData(fileresource):
@@ -129,23 +128,28 @@ class WeeksProcessor(object):
         rev_week_values = week_values[::-1]
         fitter = curve_fitting_numpy.CurveFittingNumpy(rev_week_values)
 
+        if "poly" not in result:
+            result["poly"] = []
+
         # Store result.
-        result = week_result_pb2.WeekResult()
-        result.mean = mean
-        result.std = std
-        result.name = self.__symbol
-        result.mean_value = mean_value
+        result = {}
+        result["mean"] = mean
+        result["std"] = std
+        result["name"] = self.__symbol
+        result["mean_value"] = mean_value
 
         (poly, _) = fitter.Linear()
-        linear_poly = result.poly.add()
-        linear_poly.order = 1
-        linear_poly.coef.extend(list(poly))
+        linear_poly = {}
+        linear_poly["order"] = 1
+        linear_poly["coef"] = list(poly)
+        result["poly"].append(linear_poly)
 
         poly, error, convex = fitter.Quadratic()
-        quadratic_poly = result.poly.add()
-        quadratic_poly.order = 2
-        quadratic_poly.coef.extend(list(poly))
-        quadratic_poly.error = error
-        quadratic_poly.convex = convex
+        quadratic_poly = {}
+        quadratic_poly["order"] = 2
+        quadratic_poly["coef"] = list(poly)
+        quadratic_poly["error"] = error
+        quadratic_poly["convex"] = convex
+        result["poly"].append(quadratic_poly)
 
         return result

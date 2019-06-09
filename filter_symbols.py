@@ -24,15 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from absl import logging
 from multiprocessing import Pool
+import json
 import os
 import shutil
 
 import filter_utils
 import flags
 import util
-import protos.filter_pb2 as filter_pb2
-import protos.week_result_pb2 as week_result_pb2
 
 flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
@@ -45,38 +45,34 @@ flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
 FLAGS = flags.Parse()
 
 
-def FilterWorker(filter_serialized, filename, output_path):
-    data_filter = filter_pb2.Filter()
-    data_filter.ParseFromString(filter_serialized)
+def FilterWorker(data_filter, filename, output_path):
+  data = util.read_json(filename)
 
-    data = week_result_pb2.WeekResult()
-    util.ReadTextProto(filename, data)
-    
-    if filter_utils.Filter(data, data_filter):
-        return
+  if filter_utils.Filter(data, data_filter):
+    return
 
-    # At this point, we have a good symbol.
-    basename = util.Basename(filename)
-    shutil.copyfile(filename, os.path.join(output_path, basename + '.res'))
-    png_file = os.path.join(os.path.dirname(filename), basename + '.png')
-    shutil.copyfile(png_file, os.path.join(output_path, basename + '.png'))
+  # At this point, we have a good symbol.
+  basename = util.Basename(filename)
+  shutil.copyfile(filename, os.path.join(output_path, basename + '.res'))
+  png_file = os.path.join(os.path.dirname(filename), basename + '.png')
+  shutil.copyfile(png_file, os.path.join(output_path, basename + '.png'))
 
 
 def main():
-    data_filter = filter_pb2.Filter()
-    util.ReadTextProto(FLAGS.filter, data_filter)
-    filter_serialized = data_filter.SerializeToString()
-    print data_filter
+  logging.set_verbosity(logging.DEBUG)
 
-    data_files = util.SafeReadLines(FLAGS.filename)
-    print 'Processing %d files' % len(data_files)
-    pool = Pool(processes=FLAGS.num_threads)
-    for data_file in data_files:
-        pool.apply_async(FilterWorker, [filter_serialized, data_file,
-                                        FLAGS.output_path])
-    pool.close()
-    pool.join()
+  data_filter = util.read_json(FLAGS.filter)
+  print(json.dumps(data_filter, indent=4, sort_keys=True))
+
+  data_files = util.SafeReadLines(FLAGS.filename)
+  print('Processing %d files' % len(data_files))
+  pool = Pool(processes=FLAGS.num_threads)
+  for data_file in data_files:
+    pool.apply_async(FilterWorker, [data_filter, data_file,
+                                    FLAGS.output_path])
+  pool.close()
+  pool.join()
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     main()

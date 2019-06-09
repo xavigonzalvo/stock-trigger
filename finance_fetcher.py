@@ -140,3 +140,18 @@ class FinanceFetcher(object):
       with urllib.request.urlopen(req, timeout=15) as response:
         data = json.loads(response.read())
         return data['marketcap']
+
+    def GetName(self, symbol):
+      values = {
+          'token': self._iexcloud_token,
+      }
+      values = urllib.parse.urlencode(values)
+      info = {
+          'url': self._IEXCLOUD_SERVER,
+          'symbol': symbol,
+          'values': values
+      }
+      req = '{url}/stable/stock/{symbol}/company?{values}'.format(**info)
+      with urllib.request.urlopen(req, timeout=15) as response:
+        data = json.loads(response.read())
+        return data['companyName']
