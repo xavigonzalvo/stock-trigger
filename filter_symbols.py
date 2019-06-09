@@ -42,24 +42,27 @@ flags.FLAGS.add_argument("--output_path", required=True,
                          help="Output folder")
 flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
                          help="Number of threads")
+flags.FLAGS.add_argument("--debug", required=False, type=bool, default=False,
+                         help="If true, print filtered causes")
 FLAGS = flags.Parse()
 
 
-def FilterWorker(data_filter, filename, output_path):
+def _filter_worker(data_filter, filename, output_path):
   data = util.read_json(filename)
 
-  if filter_utils.Filter(data, data_filter):
+  if filter_utils.filter(data, data_filter):
     return
 
   # At this point, we have a good symbol.
   basename = util.Basename(filename)
-  shutil.copyfile(filename, os.path.join(output_path, basename + '.res'))
+  shutil.copyfile(filename, os.path.join(output_path, basename + '.json'))
   png_file = os.path.join(os.path.dirname(filename), basename + '.png')
   shutil.copyfile(png_file, os.path.join(output_path, basename + '.png'))
 
 
 def main():
-  logging.set_verbosity(logging.DEBUG)
+  if FLAGS.debug:
+    logging.set_verbosity(logging.DEBUG)
 
   data_filter = util.read_json(FLAGS.filter)
   print(json.dumps(data_filter, indent=4, sort_keys=True))
@@ -68,11 +71,11 @@ def main():
   print('Processing %d files' % len(data_files))
   pool = Pool(processes=FLAGS.num_threads)
   for data_file in data_files:
-    pool.apply_async(FilterWorker, [data_filter, data_file,
-                                    FLAGS.output_path])
+    pool.apply_async(_filter_worker, [data_filter, data_file,
+                                      FLAGS.output_path])
   pool.close()
   pool.join()
 
 
 if __name__ == "__main__":
-    main()
+  main()

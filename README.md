@@ -29,12 +29,12 @@ Build protocol buffers for this project:
 * From a list of stocks:
 
         $ mkdir -p data/csv
-        $ ./get_historical_data.py --filename config/symbols_little --output_path data/csv --num_threads=10
+        $ ./get_historical_data.py --filename config/symbols_little --output_path data/csv --api_key XX
 
 * A single symbol:
 
         $ mkdir -p data/csv
-        $ ./get_historical_data.py --symbol GOOG --output_path data/csv --overwrite
+        $ ./get_historical_data.py --symbol GOOG --output_path data/csv --overwrite --api_key XX
 
 
 ### Generating data to get polynomial models
@@ -57,8 +57,8 @@ In order to filter information of a set of stock symbols, you can do
 it locally too:
 
     $ mkdir data/filtered
-    $ for f in data/res/*.res; do echo $f >> /tmp/res_list; done
-    $ ./filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.ascii_proto
+    $ for f in data/res/*.json; do echo $f >> /tmp/res_list; done
+    $ ./filter_symbols.py --filename /tmp/res_list --output_path data/filtered/ --filter filters/soft.json
 
 You can look at the mean percentage changes over the number of weeks
 each symbol has been processed for:

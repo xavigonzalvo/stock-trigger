@@ -37,7 +37,7 @@ def _second_order_root(poly):
   return - b + math.sqrt(b * b - 4 * a * c) / (2 * a)
 
 
-def Filter(data, data_filter):
+def filter(data, data_filter):
   """Decides whether to filter a symbol.
 
   Returns:

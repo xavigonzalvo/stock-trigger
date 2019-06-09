@@ -28,7 +28,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from multiprocessing import Pool, Manager
+from absl import logging
+from multiprocessing import Pool, Manager, Process
+from multiprocessing.pool import ThreadPool
 
 import flags
 import util
@@ -47,42 +49,43 @@ flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
 flags.FLAGS.add_argument("--make_graphs", default=False,
                          help="Generate graph of each symbol",
                          action="store_true")
+flags.FLAGS.add_argument("--iexcloud_token", required=True,
+                         help="iexcloud token")
 FLAGS = flags.Parse()
 
 
-def InitWorker():
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-
-
-def ProcessorWorker(runner, filename, num_weeks, output_path, make_graphs):
-    runner.Run(filename, num_weeks, output_path, make_graphs)
+def _process_worker(runner, filename, num_weeks, output_path, make_graphs):
+  runner.Run(filename, num_weeks, output_path, make_graphs)
 
 
 def main():
-    data_files = util.SafeReadLines(FLAGS.filename)
-    print 'Processing %d files' % len(data_files)
-    pool = Pool(FLAGS.num_threads, InitWorker)
-    manager = Manager()
-    lock = manager.Lock()
-    runner = symbol_data_generator.Runner(lock)
-    for data_file in data_files:
-        pool.apply_async(ProcessorWorker, [runner, data_file, FLAGS.num_weeks,
-                                           FLAGS.output_path, FLAGS.make_graphs])
+  logging.set_verbosity(logging.INFO)
+  data_files = util.SafeReadLines(FLAGS.filename)
+  print('Processing %d files' % len(data_files))
+  pool = ThreadPool(FLAGS.num_threads)
+  manager = Manager()
+  lock = manager.Lock()
+  runner = symbol_data_generator.Runner(
+      lock, iexcloud_token=FLAGS.iexcloud_token)
+  pp = []
+  for data_file in data_files:
+    pool.apply_async(_process_worker, [runner, data_file, FLAGS.num_weeks,
+                                       FLAGS.output_path, FLAGS.make_graphs])
 
-    try:
-        wait_seconds = len(data_files) / FLAGS.num_threads / 2
-        print '\rWaiting %d seconds...' % wait_seconds
-        time.sleep(wait_seconds)
-    except KeyboardInterrupt as e:
-        print 'STOPPING'
-        # Signal all workers to quit
-        pool.terminate()
-        pool.join()
-    else:
-        pool.close()
-        pool.join()
-        print 'Processed %d files' % len(data_files)
+  try:
+    wait_seconds = len(data_files) / FLAGS.num_threads / 2
+    print('\rWaiting %d seconds...' % wait_seconds)
+    time.sleep(wait_seconds)
+  except KeyboardInterrupt as e:
+    print('STOPPING')
+    # Signal all workers to quit
+    pool.terminate()
+    pool.join()
+  else:
+    pool.close()
+    pool.join()
+    print('Processed %d files' % len(data_files))
 
 
 if __name__ == "__main__":
-    main()
+  main()

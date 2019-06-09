@@ -26,9 +26,9 @@ SOFTWARE.
 import matplotlib.pyplot as plt
 import json
 import os
+from absl import logging
 
 import curve_fitting
-import logging
 import util
 import weeks_processor
 import finance_fetcher
@@ -99,7 +99,7 @@ class Runner(object):
                               if num_weeks > 0 else 'all')
     # Output paths.
     output_figure_path = os.path.join(output_path, '%s.png' % res_filename)
-    output_result_path = os.path.join(output_path, '%s.res' % res_filename)
+    output_result_path = os.path.join(output_path, '%s.json' % res_filename)
 
     # Read data.
     data = weeks_processor.ReadData(filename)
