@@ -25,8 +25,6 @@ SOFTWARE.
 
 import json
 
-import gae_setup
-
 import datetime
 import cgi
 import StringIO
