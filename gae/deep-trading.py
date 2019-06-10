@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import gae_setup  # Needs to be first
-
 from datetime import datetime
 
 from google.appengine.api import users

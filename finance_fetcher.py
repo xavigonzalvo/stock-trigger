@@ -32,7 +32,7 @@ from urllib2 import urlopen, HTTPError
 
 
 class Error(Exception):
-    pass
+  pass
 
 
 class FinanceFetcher(object):
@@ -88,33 +88,9 @@ class FinanceFetcher(object):
         raise Error('Failed to process query "{}" with error {}'.format(
             values, e.code))
 
-    def GetAllSymbols(self):
+    def get_all_symbols(self):
+      """Gets all symbols from the finance sector."""
       raise NotImplemented("Missing for AlphaAdvantage")
-    #     """Gets all LSE symbols using a YQL request."""
-    #     values = {
-    #         'q': ('select * from yahoo.finance.industry '
-    #               'where id in (select industry.id from '
-    #               'yahoo.finance.sectors)'),
-    #         'env': 'store://datatables.org/alltableswithkeys',
-    #         'format': 'json',
-    #     }
-    #     # TODO(xavigonzalvo): there are some cases where the data
-    #     # doesn't match
-    #     data = json.loads(self._GetData(self.__YQL_SERVER, values))
-    #     industries = data['query']['results']['industry']
-    #     companies = []
-    #     for item in industries:
-    #         if 'company' in item:
-    #             for company in item['company']:
-    #                 if type(company) == dict:
-    #                     symbol = company['symbol']
-    #                     if '.L' in symbol:
-    #                         companies.append(symbol)
-    #                 else:
-    #                     print company
-    #         else:
-    #             print item
-    #     return companies
 
     def GetHistorical(self, symbol, start_year, end_year, period,
                       test_mode=False):
