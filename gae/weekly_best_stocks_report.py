@@ -23,17 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import gae_setup  # Needs to be first
-
 from google.appengine.ext import deferred
 from google.appengine.api import mail
 import gae_config
 import gae_symbol_processor
 import gae_utils
 import ndb_data
-import protos.filter_pb2 as filter_pb2
 import webapp2
-    
+
 
 def SendReport(report_html):
     message = mail.EmailMessage(sender=gae_config.SENDER_MAIL,
@@ -42,7 +39,7 @@ def SendReport(report_html):
     message.html = report_html
     message.send()
 
-        
+
 class LastStocksReport(webapp2.RequestHandler):
 
     def get(self):
@@ -50,11 +47,8 @@ class LastStocksReport(webapp2.RequestHandler):
         self.response.write('<h1>Report</h1>')
 
         # Load filters.
-        hard_data_filter = filter_pb2.Filter()
-        gae_utils.ReadTextProto('filters/hard.ascii_proto', hard_data_filter)
-        medium_data_filter = filter_pb2.Filter()
-        gae_utils.ReadTextProto('filters/medium.ascii_proto',
-                                medium_data_filter)
+        hard_data_filter = gae_utils.read_json('filters/hard.json')
+        medium_data_filter = gae_utils.read_json('filters/medium.json')
 
         # Regenerate report if it exists.
         report_info = ndb_data.ReportsProperty.query().get()
@@ -62,9 +56,10 @@ class LastStocksReport(webapp2.RequestHandler):
         if report_info and processor.Load(report_info.last):
             self.response.write('<p>Regenerating report</p>')
 
-        processor.FilterSymbols(hard_data_filter, medium_data_filter)
+        all_symbols = processor.FilterSymbols(hard_data_filter,
+                                              medium_data_filter)
         processor.Save()
-        report_html = processor.CreateReport()
+        report_html = processor.CreateReport(all_symbols)
         SendReport(report_html)
 
         self.response.write(report_html)

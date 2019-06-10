@@ -15,9 +15,9 @@ handlers:
   script: deep-trading.application
 
 libraries:
-- name: numpy
-  version: "latest"
-  
+ - name: numpy
+   version: "latest"
+
 builtins:
 - deferred: on
 - remote_api: on

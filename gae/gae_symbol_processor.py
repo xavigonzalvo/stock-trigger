@@ -23,12 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import json
 import urllib
 
 import filter_utils
 import gae_config
 import ndb_data
-import protos.week_result_pb2 as week_result_pb2
 
 
 class SymbolProcessor(object):
@@ -57,20 +57,22 @@ class SymbolProcessor(object):
         symbols = ndb_data.SymbolProperty.query()
         self.report.count_correct_analysis = 0
         self.report.count_total = 0
+        all_symbols = []
         for symbol in symbols:
             for analysis in symbol.analysis:
                 if analysis.date != self.report.date:
-                    continue            
+                    continue
                 self.report.count_correct_analysis += 1
-                data = week_result_pb2.WeekResult()
-                data.ParseFromString(analysis.data)
-                
-                if not filter_utils.Filter(data, hard_data_filter):
+                data = json.loads(analysis.data)
+
+                if not filter_utils.filter(data, hard_data_filter):
                     self.report.hard_good_symbols.append(data.name)
-                if not filter_utils.Filter(data, medium_data_filter):
+                if not filter_utils.filter(data, medium_data_filter):
                     self.report.medium_good_symbols.append(data.name)
                 break
             self.report.count_total += 1
+            all_symbols.append(symbol.name)
+        return all_symbols
 
     def _GenerateSymbolReport(self, symbols):
         """Returns a list of HTML lines with a link to each symbol."""
@@ -82,12 +84,12 @@ class SymbolProcessor(object):
                                             symbol))
         return html_lines
 
-    def CreateReport(self):
+    def CreateReport(self, all_symbols):
         """Generates an HTML report given good symbols."""
         hard_part = self._GenerateSymbolReport(self.report.hard_good_symbols)
         medium_part = self._GenerateSymbolReport(
             self.report.medium_good_symbols)
-    
+
         hard_msg_symbols_html = ['%s<br>' % symbol for symbol in hard_part]
         medium_msg_symbols_html = ['%s<br>' % symbol for symbol in medium_part]
         msg_html = """<h2>Stats</h2>
@@ -95,10 +97,12 @@ class SymbolProcessor(object):
                       count_total = %d<br>
                       count_correct_analysis = %d</p>
                       <h2>Hard filtered symbols</h2><p>%s</p>
-                      <h2>Medium filtered symbols</h2><p>%s</p>""" % (
+                      <h2>Medium filtered symbols</h2><p>%s</p>
+                      <h2>All symbols</h2><p>%s</p>""" % (
             self.report.date,
             self.report.count_total,
             self.report.count_correct_analysis,
             "".join(hard_msg_symbols_html),
-            "".join(medium_msg_symbols_html))    
+            "".join(medium_msg_symbols_html),
+            "<br>".join(all_symbols))
         return msg_html

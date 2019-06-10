@@ -24,7 +24,10 @@ SOFTWARE.
 """
 
 import math
-from absl import logging
+try:
+  from absl import logging
+except ImportError:
+    import logging
 
 
 def _second_order_root(poly):
@@ -43,10 +46,11 @@ def filter(data, data_filter):
   Returns:
     True if the symbol has to be filtered out.
   """
-  for word in data_filter["to_filter"]:
-    if word.lower() in data["name"].lower():
-      logging.debug("Symbol filtered")
-      return True
+  if "to_filter" in data_filter:
+    for word in data_filter["to_filter"]:
+      if word.lower() in data["name"].lower():
+        logging.debug("Symbol filtered")
+        return True
 
   if "market_cap" in data:
     if (data["market_cap"] < data_filter["min_market_cap"] or

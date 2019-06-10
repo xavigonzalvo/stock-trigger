@@ -128,15 +128,13 @@ class WeeksProcessor(object):
         rev_week_values = week_values[::-1]
         fitter = curve_fitting_numpy.CurveFittingNumpy(rev_week_values)
 
-        if "poly" not in result:
-            result["poly"] = []
-
         # Store result.
         result = {}
         result["mean"] = mean
         result["std"] = std
         result["name"] = self.__symbol
         result["mean_value"] = mean_value
+        result["poly"] = []
 
         (poly, _) = fitter.Linear()
         linear_poly = {}

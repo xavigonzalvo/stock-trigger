@@ -1,18 +1,21 @@
-from google.protobuf import text_format
+"""Set of utils for AppEngine."""
 
-def ReadTextProto(filename, proto):
-    """Reads a protobuf in text mode."""
-    with open(filename, 'r') as f:
-        text_format.Merge(f.read(), proto)
+import json
 
 
 def SafeReadLines(filename):
-    """Reads all lines from a file making.
+  """Reads all lines from a file making.
 
-    It makes sure there are no spaces at the beginning and end.
-    """
-    lines = []
-    with open(filename) as f:
-        for line in f.readlines():
-            lines.append(line.strip())
-    return lines
+  It makes sure there are no spaces at the beginning and end.
+  """
+  lines = []
+  with open(filename) as f:
+    for line in f.readlines():
+      lines.append(line.strip())
+  return lines
+
+
+def read_json(filename):
+  """Reads a json in text mode."""
+  with open(filename, 'r') as f:
+    return json.loads(f.read())

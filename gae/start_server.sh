@@ -3,4 +3,4 @@
 set -v
 set -e
 
-dev_appserver.py ./
+dev_appserver.py --enable_console=true ./
