@@ -25,7 +25,8 @@ SOFTWARE.
 
 from google.appengine.api import mail
 
-from app_reports import AppReports
+from app_reports_accessor import AppReportsAccessor
+from app_report_accessor import AppReportAccessor
 import gae_config
 import gae_symbol_processor
 import gae_utils
@@ -51,14 +52,16 @@ class LastStocksReport(webapp2.RequestHandler):
     medium_data_filter = gae_utils.read_json('filters/medium.json')
 
     # Generate a report and regenerate it if it exists.
-    reports = AppReports()
-    processor = gae_symbol_processor.SymbolProcessor()
-    if processor.load(reports.last_date()):
+    reports_accessor = AppReportsAccessor()
+    report_accessor = AppReportAccessor()
+    if report_accessor.load(reports_accessor.last_date()):
       self.response.write('<p>Regenerating report</p>')
-
+    processor = gae_symbol_processor.SymbolProcessor(report_accessor)
     processor.filter_symbols(hard_data_filter, medium_data_filter)
-    processor.save()
-    report_html = processor.generate_report()
+    report_accessor.save()
+    reports_accessor.add_new_report(report_accessor.report.date)
+
+    report_html = processor.generate_html_report()
     _send_report(report_html)
 
     self.response.write(report_html)

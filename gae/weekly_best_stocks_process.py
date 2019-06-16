@@ -30,7 +30,7 @@ import logging
 
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
-from app_reports import AppReports
+from app_reports_accessor import AppReportsAccessor
 from app_symbol_accessor import AppSymbolAccessor
 import gae_config
 import gae_utils
@@ -74,7 +74,7 @@ def _worker_fn(symbol, current_date, period, current_year, from_year,
 def _process_symbols_fn(symbols, period, current_year, from_year, period_type):
   """Processes information of all symbols and stores each one."""
   current_date = datetime.datetime.now()
-  reports = AppReports()
+  reports = AppReportsAccessor()
   reports.add_new_report(current_date)
   for symbol in symbols:
     deferred.defer(_worker_fn, symbol, current_date, period, current_year,

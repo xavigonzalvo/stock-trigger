@@ -33,7 +33,7 @@ import gae_symbol_processor
 import webapp2
 
 
-def CreateSummary(report):
+def _create_symmary(report):
   percentage = 0.0
   if report.count_total > 0:
     percentage = len(report.hard_good_symbols) / float(report.count_total)
@@ -52,7 +52,7 @@ class SymbolsTool(webapp2.RequestHandler):
     if action == 'count':
       symbols = ndb_data.SymbolProperty.query().fetch(keys_only=True)
       num_symbols = 0
-      for symbol in symbols:
+      for _ in symbols:
         num_symbols += 1
       message = "<p>Number of symbols: {}</p>".format(num_symbols)
     elif action == 'list':
@@ -64,6 +64,32 @@ class SymbolsTool(webapp2.RequestHandler):
     elif action == 'delete':
       ndb.delete_multi(
           ndb_data.SymbolProperty.query().fetch(keys_only=True))
+      message = "<p>Deleted</p>"
+    else:
+      message = "No valid action: {}".format(action)
+
+    html = r"""<html><body>{}</body></html>""".format(message)
+    self.response.headers['Content-Type'] = 'text/html'
+    self.response.write(html)
+
+
+class ReportsTool(webapp2.RequestHandler):
+  """A set of tools to manage reports."""
+
+  def get(self):
+    action = self.request.get('action')
+
+    num_symbols = None
+    error = None
+    if action == 'count':
+      reports = ndb_data.ReportProperty.query().fetch(keys_only=True)
+      num_reports = 0
+      for _ in reports:
+        num_reports += 1
+      message = "<p>Number of reports: {}</p>".format(num_reports)
+    elif action == 'delete':
+      ndb.delete_multi(
+          ndb_data.ReportProperty.query().fetch(keys_only=True))
       message = "<p>Deleted</p>"
     else:
       message = "No valid action: {}".format(action)
@@ -85,8 +111,9 @@ class StocksReport(webapp2.RequestHandler):
       report_date = datetime.strptime(
           report_date_req, '%Y-%m-%d %H:%M:%S.%f')
       processor = gae_symbol_processor.SymbolProcessor()
+      ##
       processor.load(report_date)
-      report_html = processor.generate_report()
+      report_html = processor.generate_html_report()
       self.response.write(report_html)
       return
 
@@ -99,7 +126,7 @@ class StocksReport(webapp2.RequestHandler):
         fetch_page(10, start_cursor=curs))
     for report in reports:
       self.response.write('<p><a href="/stocks_report?date=%s">%s</a></p>' %
-                          (report.date, CreateSummary(report)))
+                          (report.date, _create_symmary(report)))
     if more and next_curs:
       self.response.out.write('<a href="/stocks_report?cursor=%s">More...</a>' %
                               next_curs.urlsafe())
@@ -121,9 +148,15 @@ class MainPage(webapp2.RequestHandler):
       self.response.write('<li><a href="/symbols_tool?action=list">List symbols</a></li>')
       self.response.write('<li><a href="/symbols_tool?action=delete">Delete all symbols</a></li>')
       self.response.write('</ul>')
+      self.response.write('<p>Reports tool</p>')
+      self.response.write('<ul>')
+      self.response.write('<li><a href="/reports_tool?action=count">Count reports</a></li>')
+      self.response.write('<li><a href="/stocks_report">List reports</a></li>')
+      self.response.write('<li><a href="/reports_tool?action=delete">Delete all reports</a></li>')
+      self.response.write('</ul>')
       self.response.write('<p><a href="/cron/weekly_best_stocks_process?test=2">Test symbol processor</a></p>')
-      self.response.write('<p><a href="/cron/weekly_best_stocks_process">Run symbol processor</a></p>')
-      self.response.write('<p><a href="/cron/weekly_best_stocks_report">Run symbol report</a></p>')
+      self.response.write('<hr><p><a href="/cron/weekly_best_stocks_process">Run symbols processor</a></p>')
+      self.response.write('<p><a href="/cron/weekly_best_stocks_report">Run symbols report</a></p>')
     else:
       greeting = ('<a href="%s">Sign in or register</a>.' %
                   users.create_login_url('/'))
@@ -133,5 +166,6 @@ class MainPage(webapp2.RequestHandler):
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/symbols_tool', SymbolsTool),
+    ('/reports_tool', ReportsTool),
     ('/stocks_report', StocksReport),
 ], debug=True)

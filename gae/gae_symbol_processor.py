@@ -28,24 +28,15 @@ import urllib
 import logging
 
 from app_symbols_accessor import AppSymbolsAccessor
-from app_report import AppReport
 import filter_utils
 import gae_config
-
 
 
 class SymbolProcessor(object):
   """Class to handle symbols, filter and generating reports."""
 
-  def __init__(self):
-    self._report = AppReport()
-
-  def load(self, date):
-    """Returns True if the report exists."""
-    self._report.load(date)
-
-  def save(self):
-    self._report.save()
+  def __init__(self, report_accessor):
+    self._report_accessor = report_accessor
 
   def filter_symbols(self, hard_data_filter, medium_data_filter):
     """Filters symbols using filters.
@@ -53,7 +44,7 @@ class SymbolProcessor(object):
     Uses the last date stored in report as the reference to pick values
     from stored symbols.
     """
-    report = self._report.report()
+    report = self._report_accessor.report
     report.hard_good_symbols = []
     report.medium_good_symbols = []
     report.count_correct_analysis = 0
@@ -85,9 +76,9 @@ class SymbolProcessor(object):
                                      symbol))
     return html_lines
 
-  def generate_report(self):
+  def generate_html_report(self):
     """Generates an HTML report given good symbols."""
-    report = self._report.report()
+    report = self._report_accessor.report
     hard_section = self._generate_symbol_report(report.hard_good_symbols)
     medium_section = self._generate_symbol_report(report.medium_good_symbols)
 

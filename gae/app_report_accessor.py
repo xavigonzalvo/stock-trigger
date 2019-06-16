@@ -1,13 +1,13 @@
 import logging
 
-import base_report
+from base_report_accessor import BaseReportAccessor
 import ndb_data
 
 
-class AppReport(base_report.BaseReport):
+class AppReportAccessor(BaseReportAccessor):
 
   def __init__(self):
-    super(AppReport, self).__init__()
+    super(AppReportAccessor, self).__init__()
     self._report = ndb_data.ReportProperty()
 
   def save(self):

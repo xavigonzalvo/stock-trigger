@@ -1,7 +1,7 @@
 import abc
 
 
-class BaseReport(object):
+class BaseReportAccessor(object):
   """A handler of reports."""
 
   __metaclass__ = abc.ABCMeta
@@ -17,5 +17,6 @@ class BaseReport(object):
   def load(self, date):
     raise NotImplementedError
 
+  @property
   def report(self):
     return self._report
