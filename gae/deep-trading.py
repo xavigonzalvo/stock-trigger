@@ -28,6 +28,7 @@ from google.appengine.ext import ndb
 
 from google.appengine.api import users
 from google.appengine.datastore.datastore_query import Cursor
+from app_report_accessor import AppReportAccessor
 import ndb_data
 import gae_symbol_processor
 import webapp2
@@ -110,10 +111,13 @@ class StocksReport(webapp2.RequestHandler):
     if report_date_req:
       report_date = datetime.strptime(
           report_date_req, '%Y-%m-%d %H:%M:%S.%f')
-      processor = gae_symbol_processor.SymbolProcessor()
-      ##
-      processor.load(report_date)
+      report_accessor = AppReportAccessor()
+      if not report_accessor.load(report_date):
+        logging.info("Couldn't find report with date %s", date)
+        return
+      processor = gae_symbol_processor.SymbolProcessor(report_accessor)
       report_html = processor.generate_html_report()
+      self.response.write("Loaded report")
       self.response.write(report_html)
       return
 
