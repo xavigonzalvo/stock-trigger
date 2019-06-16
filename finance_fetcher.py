@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import logging
 import sys
 import json
 import re
@@ -63,6 +64,9 @@ class FinanceFetcher(object):
 
       Returns:
         The data as a list.
+
+      Raises:
+        Error: if response doesn't contain the data.
       """
       try:
         values['function'] = self._TIME_SERIES[period]
@@ -77,8 +81,11 @@ class FinanceFetcher(object):
           logging.error("Failed to get a response")
         finally:
           data = json.loads(response.read())
-          time_series_key = self._KEY_TIME_SERIES[period]
-          time_data = data[time_series_key]
+          if self._KEY_TIME_SERIES[period] not in data:
+            logging.error("Key %s not in response data: %s",
+                          self._KEY_TIME_SERIES[period], data)
+            raise Error("Couldn't process symbol")
+          time_data = data[self._KEY_TIME_SERIES[period]]
           sorted(time_data, key=lambda k: k, reverse=False)
           data = []
           for _, values_per_period in time_data.items():
@@ -92,8 +99,8 @@ class FinanceFetcher(object):
       """Gets all symbols from the finance sector."""
       raise NotImplemented("Missing for AlphaAdvantage")
 
-    def GetHistorical(self, symbol, start_year, end_year, period,
-                      test_mode=False):
+    def get_historical(self, symbol, start_year, end_year, period,
+                       test_mode=False):
       """Gets historical values.
 
       Args:
@@ -111,7 +118,7 @@ class FinanceFetcher(object):
       data.insert(0, "close")
       return '\n'.join(data)
 
-    def GetMarketCap(self, symbol):
+    def get_market_cap(self, symbol):
       values = {
         'token': self._iexcloud_token,
       }
@@ -130,7 +137,7 @@ class FinanceFetcher(object):
         data = json.loads(response.read())
         return data['marketcap']
 
-    def GetName(self, symbol):
+    def get_name(self, symbol):
       values = {
           'token': self._iexcloud_token,
       }

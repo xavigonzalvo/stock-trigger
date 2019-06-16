@@ -27,10 +27,11 @@ import json
 import urllib
 import logging
 
+from app_symbols_accessor import AppSymbolsAccessor
 from app_report import AppReport
 import filter_utils
 import gae_config
-import ndb_data
+
 
 
 class SymbolProcessor(object):
@@ -58,7 +59,8 @@ class SymbolProcessor(object):
     report.count_correct_analysis = 0
     report.count_total = 0
 
-    symbols = ndb_data.SymbolProperty.query()
+    symbols_accessor = AppSymbolsAccessor()
+    symbols = symbols_accessor.get_all_symbols(keys_only=False)
     for symbol in symbols:
       for analysis in symbol.analysis:
         if analysis.date != report.date:
@@ -85,10 +87,9 @@ class SymbolProcessor(object):
 
   def generate_report(self):
     """Generates an HTML report given good symbols."""
-    hard_section = self._generate_symbol_report(
-        self._report.report().hard_good_symbols)
-    medium_section = self._generate_symbol_report(
-        self._report.report().medium_good_symbols)
+    report = self._report.report()
+    hard_section = self._generate_symbol_report(report.hard_good_symbols)
+    medium_section = self._generate_symbol_report(report.medium_good_symbols)
 
     hard_msg_symbols_html = ['%s<br>' % symbol for symbol in hard_section]
     medium_msg_symbols_html = ['%s<br>' % symbol
@@ -99,9 +100,9 @@ class SymbolProcessor(object):
                   count_correct_analysis = %d</p>
                   <h2>Hard filtered symbols</h2><p>%s</p>
                   <h2>Medium filtered symbols</h2><p>%s</p>""" % (
-        self._report.report().date,
-        self._report.report().count_total,
-        self._report.report().count_correct_analysis,
+        report.date,
+        report.count_total,
+        report.count_correct_analysis,
         "".join(hard_msg_symbols_html),
         "".join(medium_msg_symbols_html))
     return msg_html

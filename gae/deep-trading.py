@@ -121,6 +121,7 @@ class MainPage(webapp2.RequestHandler):
       self.response.write('<li><a href="/symbols_tool?action=list">List symbols</a></li>')
       self.response.write('<li><a href="/symbols_tool?action=delete">Delete all symbols</a></li>')
       self.response.write('</ul>')
+      self.response.write('<p><a href="/cron/weekly_best_stocks_process?test=2">Test symbol processor</a></p>')
       self.response.write('<p><a href="/cron/weekly_best_stocks_process">Run symbol processor</a></p>')
       self.response.write('<p><a href="/cron/weekly_best_stocks_report">Run symbol report</a></p>')
     else:

@@ -47,10 +47,10 @@ def _worker_fn(symbol, current_date, period, current_year, from_year,
       api_key=gae_config.ALPHA_ADVANTAGE_API,
       iexcloud_token=gae_config.IEXCLOUD_TOKEN)
   try:
-    data = fetcher.GetHistorical(symbol, from_year,
-                                 current_year, period_type)
+    data = fetcher.get_historical(symbol, from_year,
+                                  current_year, period_type)
   except FinanceFetcher.Error, e:
-    logging.error('Symbol %s not found', symbol)
+    logging.error("Symbol %s couldn't be processed", symbol)
     return
 
   # Process CSV data.
@@ -62,7 +62,7 @@ def _worker_fn(symbol, current_date, period, current_year, from_year,
   processor = weeks_processor.WeeksProcessor(csv_data, period, symbol)
   result = processor.PolynomialModel()
 
-  market_cap = fetcher.GetMarketCap(symbol)
+  market_cap = fetcher.get_market_cap(symbol)
   if market_cap:
     result["market_cap"] = market_cap
 
@@ -94,14 +94,11 @@ class BestStocksProcess(webapp2.RequestHandler):
       self.response.headers['Content-Type'] = 'text/plain'
 
       test = self.request.get('test')
-      test_mode = False
       if test:
         num = int(cgi.escape(self.request.get('test')))
-        if num == 2:
-          test_mode = True
         symbols = gae_utils.SafeReadLines('config/symbols.test%d' % num)
       else:
-        symbols = gae_utils.SafeReadLines('config/symbols.test2')
+        symbols = gae_utils.SafeReadLines('config/symbols_weekly')
       self.response.write('Processing %d symbols\n' % len(symbols))
 
       current_year = datetime.date.today().year

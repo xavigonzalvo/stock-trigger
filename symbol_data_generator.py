@@ -118,10 +118,10 @@ class Runner(object):
     logging.info('Processing "%s"' % symbol)
     fetcher = finance_fetcher.FinanceFetcher(
         iexcloud_token=self._iexcloud_token)
-    market_cap = fetcher.GetMarketCap(symbol)
+    market_cap = fetcher.get_market_cap(symbol)
     if market_cap:
       result["market_cap"] = market_cap / 1e6
-    result["name"] = fetcher.GetName(symbol)
+    result["name"] = fetcher.get_name(symbol)
 
     # Fit model.
     rev_week_values = week_values[::-1]

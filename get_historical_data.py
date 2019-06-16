@@ -62,8 +62,8 @@ def fetch_data(worker_id, fetcher, symbols):
     if os.path.exists(output) and not FLAGS.overwrite:
       continue
     try:
-      data = fetcher.GetHistorical(symbol, FLAGS.from_year,
-                                   current_year, FLAGS.period)
+      data = fetcher.get_historical(symbol, FLAGS.from_year,
+                                    current_year, FLAGS.period)
     except finance_fetcher.Error as e:
       pass
     with open(output, 'w') as f:
