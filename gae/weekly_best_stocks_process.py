@@ -33,6 +33,7 @@ import logging
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from app_reports import AppReports
+from app_symbol_accessor import AppSymbolAccessor
 import ndb_data
 import gae_config
 import gae_utils
@@ -67,15 +68,12 @@ def _worker_fn(symbol, current_date, period, current_year, from_year,
     result["market_cap"] = market_cap
 
   # Save symbol.
-  symbol_db = ndb_data.SymbolProperty.query(
-      ndb_data.SymbolProperty.name == symbol).get()
   analysis_db = ndb_data.AnalysisProperty(date=current_date,
                                           data=json.dumps(result))
-  if not symbol_db:
-    symbol_db = ndb_data.SymbolProperty(name=symbol, analysis=[analysis_db])
-  else:
-    symbol_db.analysis.append(analysis_db)
-  symbol_db.put()
+  symbol_accessor = AppSymbolAccessor()
+  symbol_accessor.load(symbol)
+  symbol_accessor.add_analysis(analysis_db)
+  symbol_accessor.save()
 
 
 def _process_symbols_fn(symbols, period, current_year, from_year, period_type):
