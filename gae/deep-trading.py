@@ -24,6 +24,7 @@ SOFTWARE.
 """
 
 from datetime import datetime
+from google.appengine.ext import ndb
 
 from google.appengine.api import users
 from google.appengine.datastore.datastore_query import Cursor
@@ -38,6 +39,38 @@ def CreateSummary(report):
     percentage = len(report.hard_good_symbols) / float(report.count_total)
   return '%s (total=%d, good=%.2f%%, ...)' % (report.date, report.count_total,
                                               percentage)
+
+
+class SymbolsTool(webapp2.RequestHandler):
+  """A set of tools to manage symbols."""
+
+  def get(self):
+    action = self.request.get('action')
+
+    num_symbols = None
+    error = None
+    if action == 'count':
+      symbols = ndb_data.SymbolProperty.query().fetch(keys_only=True)
+      num_symbols = 0
+      for symbol in symbols:
+        num_symbols += 1
+      message = "<p>Number of symbols: {}</p>".format(num_symbols)
+    elif action == 'list':
+      symbols = ndb_data.SymbolProperty.query().fetch(10)
+      all_symbols = []
+      for symbol in symbols:
+        all_symbols.append(symbol.name)
+      message = "<p>Some symbols: {}</p>".format(map(str, all_symbols))
+    elif action == 'delete':
+      ndb.delete_multi(
+          ndb_data.SymbolProperty.query().fetch(keys_only=True))
+      message = "<p>Deleted</p>"
+    else:
+      message = "No valid action: {}".format(action)
+
+    html = r"""<html><body>{}</body></html>""".format(message)
+    self.response.headers['Content-Type'] = 'text/html'
+    self.response.write(html)
 
 
 class StocksReport(webapp2.RequestHandler):
@@ -82,6 +115,12 @@ class MainPage(webapp2.RequestHandler):
                   (user.nickname(), users.create_logout_url('/')))
       self.response.out.write('<html><body>%s' % greeting)
       self.response.write('<p><a href="/stocks_report">All reports</a></p>')
+      self.response.write('<p>Symbols tool</p>')
+      self.response.write('<ul>')
+      self.response.write('<li><a href="/symbols_tool?action=count">Count symbols</a></li>')
+      self.response.write('<li><a href="/symbols_tool?action=list">List symbols</a></li>')
+      self.response.write('<li><a href="/symbols_tool?action=delete">Delete all symbols</a></li>')
+      self.response.write('</ul>')
       self.response.write('<p><a href="/cron/weekly_best_stocks_process">Run symbol processor</a></p>')
       self.response.write('<p><a href="/cron/weekly_best_stocks_report">Run symbol report</a></p>')
     else:
@@ -92,5 +131,6 @@ class MainPage(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/symbols_tool', SymbolsTool),
     ('/stocks_report', StocksReport),
 ], debug=True)

@@ -52,25 +52,26 @@ class SymbolProcessor(object):
     Uses the last date stored in report as the reference to pick values
     from stored symbols.
     """
-    self._report.report().hard_good_symbols = []
-    self._report.report().medium_good_symbols = []
-    self._report.report().count_correct_analysis = 0
-    self._report.report().count_total = 0
+    report = self._report.report()
+    report.hard_good_symbols = []
+    report.medium_good_symbols = []
+    report.count_correct_analysis = 0
+    report.count_total = 0
 
     symbols = ndb_data.SymbolProperty.query()
     for symbol in symbols:
       for analysis in symbol.analysis:
-        if analysis.date != self._report.report().date:
+        if analysis.date != report.date:
           continue
-        self._report.report().count_correct_analysis += 1
+        report.count_correct_analysis += 1
         data = json.loads(analysis.data)
 
         if not filter_utils.filter(data, hard_data_filter):
-          self._report.report().hard_good_symbols.append(data.name)
+          report.hard_good_symbols.append(data.name)
         if not filter_utils.filter(data, medium_data_filter):
-          self._report.report().medium_good_symbols.append(data.name)
+          report.medium_good_symbols.append(data.name)
         break
-      self._report.report().count_total += 1
+      report.count_total += 1
 
   def _generate_symbol_report(self, symbols):
     """Returns a list of HTML lines with a link to each symbol."""
