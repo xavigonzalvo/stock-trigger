@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import json
-
 import datetime
 import cgi
 import StringIO
@@ -34,7 +32,6 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from app_reports import AppReports
 from app_symbol_accessor import AppSymbolAccessor
-import ndb_data
 import gae_config
 import gae_utils
 import finance_fetcher as FinanceFetcher
@@ -68,11 +65,9 @@ def _worker_fn(symbol, current_date, period, current_year, from_year,
     result["market_cap"] = market_cap
 
   # Save symbol.
-  analysis_db = ndb_data.AnalysisProperty(date=current_date,
-                                          data=json.dumps(result))
   symbol_accessor = AppSymbolAccessor()
   symbol_accessor.load(symbol)
-  symbol_accessor.add_analysis(analysis_db)
+  symbol_accessor.add_analysis(current_date, result)
   symbol_accessor.save()
 
 

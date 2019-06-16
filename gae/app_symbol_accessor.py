@@ -1,5 +1,6 @@
 import base_symbol_accessor
 import ndb_data
+import json
 
 
 class AppSymbolAccessor(base_symbol_accessor.BaseSymbolAccesor):
@@ -15,7 +16,9 @@ class AppSymbolAccessor(base_symbol_accessor.BaseSymbolAccesor):
   def save(self):
     self._symbol.put()
 
-  def add_analysis(self, analysis_db):
+  def add_analysis(self, date, analysis):
+    analysis_db = ndb_data.AnalysisProperty(date=date,
+                                            data=json.dumps(analysis))
     if not self._symbol:
       self._symbol = ndb_data.SymbolProperty(name=symbol,
                                              analysis=[analysis_db])

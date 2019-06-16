@@ -18,7 +18,7 @@ class BaseSymbolAccesor(object):
     raise NotImplementedError
 
   @abc.abstractmethod
-  def add_analysis(self, analysis_db):
+  def add_analysis(self, date, analysis):
     raise NotImplementedError
 
   @property
