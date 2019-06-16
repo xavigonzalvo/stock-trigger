@@ -11,6 +11,9 @@ handlers:
   login: admin
 - url: /.*
   script: deep-trading.application
+- url: /_ah/queue/deferred
+  script: google.appengine.ext.deferred.deferred.application
+  login: admin
 
 libraries:
  - name: numpy

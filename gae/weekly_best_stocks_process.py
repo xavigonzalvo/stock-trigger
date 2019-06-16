@@ -32,6 +32,7 @@ import logging
 
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
+from app_reports import AppReports
 import ndb_data
 import gae_config
 import gae_utils
@@ -40,14 +41,14 @@ import weeks_processor
 import webapp2
 
 
-def Worker(symbol, current_date, period, current_year, from_year,
-           period_type, test_mode):
+def _worker_fn(symbol, current_date, period, current_year, from_year,
+               period_type):
   fetcher = FinanceFetcher.FinanceFetcher(
       api_key=gae_config.ALPHA_ADVANTAGE_API,
       iexcloud_token=gae_config.IEXCLOUD_TOKEN)
   try:
     data = fetcher.GetHistorical(symbol, from_year,
-                                 current_year, period_type, test_mode)
+                                 current_year, period_type)
   except FinanceFetcher.Error, e:
     logging.error('Symbol %s not found', symbol)
     return
@@ -65,6 +66,7 @@ def Worker(symbol, current_date, period, current_year, from_year,
   if market_cap:
     result["market_cap"] = market_cap
 
+  # Save symbol.
   symbol_db = ndb_data.SymbolProperty.query(
       ndb_data.SymbolProperty.name == symbol).get()
   analysis_db = ndb_data.AnalysisProperty(date=current_date,
@@ -76,17 +78,14 @@ def Worker(symbol, current_date, period, current_year, from_year,
   symbol_db.put()
 
 
-def ProcessSymbols(symbols, period, current_year, from_year, period_type,
-                   test_mode):
+def _process_symbols_fn(symbols, period, current_year, from_year, period_type):
+  """Processes information of all symbols and stores each one."""
   current_date = datetime.datetime.now()
-  report_info = ndb_data.ReportsProperty.query().get()
-  if not report_info:
-    report_info = ndb_data.ReportsProperty()
-  report_info.last = current_date
-  report_info.put()
+  reports = AppReports()
+  reports.add_new_report(current_date)
   for symbol in symbols:
-    deferred.defer(Worker, symbol, current_date, period, current_year,
-                   from_year, period_type, test_mode)
+    deferred.defer(_worker_fn, symbol, current_date, period, current_year,
+                   from_year, period_type)
 
 
 class BestStocksProcess(webapp2.RequestHandler):
@@ -102,7 +101,7 @@ class BestStocksProcess(webapp2.RequestHandler):
           test_mode = True
         symbols = gae_utils.SafeReadLines('config/symbols.test%d' % num)
       else:
-        symbols = gae_utils.SafeReadLines('config/symbols_weekly')
+        symbols = gae_utils.SafeReadLines('config/symbols.test2')
       self.response.write('Processing %d symbols\n' % len(symbols))
 
       current_year = datetime.date.today().year
@@ -116,8 +115,8 @@ class BestStocksProcess(webapp2.RequestHandler):
       if not period:
         period = 4  # for example, 4 weeks
 
-      deferred.defer(ProcessSymbols, symbols, period, current_year,
-                     from_year, period_type, test_mode=False)
+      deferred.defer(_process_symbols_fn, symbols, period, current_year,
+                     from_year, period_type)
 
 
 application = webapp2.WSGIApplication([
