@@ -25,42 +25,38 @@ SOFTWARE.
 
 import datetime
 import cgi
-import StringIO
 import logging
+import time
 
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from app_reports_accessor import AppReportsAccessor
 from app_symbol_accessor import AppSymbolAccessor
+from days_processor import DaysProcessor
+from finance_fetcher_factory import FinanceFetcherFactory
 import gae_config
 import gae_utils
-import finance_fetcher as FinanceFetcher
-import weeks_processor
 import webapp2
 
 
-def _worker_fn(symbol, current_date, period, current_year, from_year,
-               period_type):
-  fetcher = FinanceFetcher.FinanceFetcher(
-      api_key=gae_config.ALPHA_ADVANTAGE_API,
-      iexcloud_token=gae_config.IEXCLOUD_TOKEN)
+def _worker_fn(finance_fetcher, symbol, current_date, fetch_period,
+               process_period, process_window):
   try:
-    data = fetcher.get_historical(symbol, from_year,
-                                  current_year, period_type)
-  except FinanceFetcher.Error, e:
-    logging.error("Symbol %s couldn't be processed", symbol)
+    time.sleep(0.5)
+    data = finance_fetcher.get_historical(symbol, fetch_period)
+  except Exception, e:
+    logging.error("Symbol %s couldn't be processed: %s", symbol, e)
     return
 
-  # Process CSV data.
-  f = StringIO.StringIO(data)
-  csv_data = weeks_processor.ProcessData(f)
-  f.close()
+  if not data:
+    logging.error('No data retrieved for symbol %s', symbol)
+    return
 
   # Fit model.
-  processor = weeks_processor.WeeksProcessor(csv_data, period, symbol)
-  result = processor.PolynomialModel()
+  processor = DaysProcessor(data, process_period, process_window, symbol)
+  result = processor.poly_model()
 
-  market_cap = fetcher.get_market_cap(symbol)
+  market_cap = finance_fetcher.get_market_cap(symbol)
   if market_cap:
     result["market_cap"] = market_cap
 
@@ -71,20 +67,21 @@ def _worker_fn(symbol, current_date, period, current_year, from_year,
   symbol_accessor.save()
 
 
-def _process_symbols_fn(symbols, period, current_year, from_year, period_type):
+def _process_symbols_fn(symbols, fetch_period, process_period, process_window):
   """Processes information of all symbols and stores each one."""
   current_date = datetime.datetime.now()
   reports = AppReportsAccessor()
   reports.add_new_report(current_date)
+  finance_fetcher = FinanceFetcherFactory.create()
   for symbol in symbols:
-    deferred.defer(_worker_fn, symbol, current_date, period, current_year,
-                   from_year, period_type)
+    deferred.defer(_worker_fn, finance_fetcher, symbol, current_date,
+                   fetch_period, process_period, process_window)
 
 
 class BestStocksProcess(webapp2.RequestHandler):
 
     def get(self):
-      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.headers['Content-Type'] = 'text/html'
 
       test = self.request.get('test')
       if test:
@@ -92,21 +89,25 @@ class BestStocksProcess(webapp2.RequestHandler):
         symbols = gae_utils.SafeReadLines('config/symbols.test%d' % num)
       else:
         symbols = gae_utils.SafeReadLines('config/symbols_weekly')
-      self.response.write('Processing %d symbols\n' % len(symbols))
 
-      current_year = datetime.date.today().year
-      from_year = self.request.get('from_year')
-      if not from_year:
-        from_year = current_year - 2
-      period_type = self.request.get('period_type')
-      if not period_type:
-        period_type = 'w'
-      period = self.request.get('period')
-      if not period:
-        period = 4  # for example, 4 weeks
+      fetch_period = self.request.get('fetch_period')
+      if not fetch_period:
+        fetch_period = '3m'
+      process_period = self.request.get('process_period')
+      if not process_period:
+        process_period = '40'
+      process_window = self.request.get('process_window')
+      if not process_window:
+        process_window = '5'
 
-      deferred.defer(_process_symbols_fn, symbols, period, current_year,
-                     from_year, period_type)
+      self.response.write('<p>Processing %d symbols</p>' % len(symbols))
+      self.response.write('<p>Fetch period: %s</p>' % fetch_period)
+      self.response.write('<p>Process period: %s</p>' % process_period)
+      self.response.write('<p>Process window: %s</p>' % process_window)
+      self.response.write('<br><p><a href="/">Home</a></p>')
+
+      deferred.defer(_process_symbols_fn, symbols, fetch_period,
+                     int(process_period), int(process_window))
 
 
 application = webapp2.WSGIApplication([

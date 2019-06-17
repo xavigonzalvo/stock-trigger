@@ -87,7 +87,16 @@ class ReportsTool(webapp2.RequestHandler):
       num_reports = 0
       for _ in reports:
         num_reports += 1
-      message = "<p>Number of reports: {}</p>".format(num_reports)
+      last_report_date = "no report"
+      if num_reports > 0:
+        last_report = ndb_data.ReportProperty.query().order(
+            -ndb_data.ReportProperty.date).fetch(limit=1)[0]
+        last_report_date = last_report.date
+      reports_container = ndb_data.ReportsProperty.query().fetch()[0]
+      message = r"""<p>Number of reports: {}</p>
+      <p>Last date container: {}</p>
+      <p>Last report date: {}</p>
+      """.format(num_reports, reports_container.last, last_report_date)
     elif action == 'delete':
       ndb.delete_multi(
           ndb_data.ReportProperty.query().fetch(keys_only=True))
@@ -145,7 +154,6 @@ class MainPage(webapp2.RequestHandler):
       greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
                   (user.nickname(), users.create_logout_url('/')))
       self.response.out.write('<html><body>%s' % greeting)
-      self.response.write('<p><a href="/stocks_report">All reports</a></p>')
       self.response.write('<p>Symbols tool</p>')
       self.response.write('<ul>')
       self.response.write('<li><a href="/symbols_tool?action=count">Count symbols</a></li>')

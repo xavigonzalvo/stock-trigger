@@ -28,7 +28,7 @@ from google.appengine.ext import ndb
 
 class ReportProperty(ndb.Model):
   # When the report was generated.
-  date = ndb.DateTimeProperty(indexed=True, auto_now_add=True)
+  date = ndb.DateTimeProperty(indexed=True)
 
   # Hard filtered good symbols.
   hard_good_symbols = ndb.StringProperty(repeated=True)

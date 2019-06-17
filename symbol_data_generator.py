@@ -30,8 +30,8 @@ from absl import logging
 
 import curve_fitting
 import util
-import weeks_processor
-import finance_fetcher
+import days_processor
+from iexcloud_finance_fetcher import FinanceFetcher
 
 
 class Runner(object):
@@ -93,39 +93,41 @@ class Runner(object):
     #cubic_poly.error = error
     return (poly_quadratic, poly_cubic, poly_linear)
 
-  def Run(self, filename, num_weeks, output_path, make_graphs):
+  def Run(self, filename, num_days, window, output_path, make_graphs):
     # Save plots.
-    res_filename = '%s-%s' % (util.Basename(filename), str(num_weeks)
-                              if num_weeks > 0 else 'all')
+    res_filename = '{}-{}'.format(util.Basename(filename), num_days)
     # Output paths.
-    output_figure_path = os.path.join(output_path, '%s.png' % res_filename)
-    output_result_path = os.path.join(output_path, '%s.json' % res_filename)
+    output_figure_path = os.path.join(output_path,
+                                      '{}.png'.format(res_filename))
+    output_result_path = os.path.join(output_path,
+                                      '{}.json'.format(res_filename))
 
     # Read data.
-    data = weeks_processor.ReadData(filename)
-    total_num_weeks = len(data)
-    logging.info('%d weeks for analysis (%d months, %d years)' % (
-        total_num_weeks, total_num_weeks / 4, total_num_weeks / 4 / 12))
+    data = days_processor.read_data(filename)
+    total_num_days = len(data)
+    logging.info('%d days for analysis', total_num_days)
 
     # Process data.
-    processor = weeks_processor.WeeksProcessor(data, num_weeks)
-    (percentual_change, week_values, mean, std, _) = processor.Process()
+    close_data = []
+    for day in data:
+      close_data.append(float(day['close']))
+    processor = days_processor.DaysProcessor(close_data, num_days, window)
+    (percentual_change, averaged_values, mean, std, _) = processor.process()
 
     result = {}
     result["mean"] = mean
     result["std"] = std
     symbol = util.GetSymbolFromFilename(filename)
-    logging.info('Processing "%s"' % symbol)
-    fetcher = finance_fetcher.FinanceFetcher(
-        iexcloud_token=self._iexcloud_token)
+    logging.info('Processing "%s"', symbol)
+    fetcher = FinanceFetcher(api_key=self._iexcloud_token)
     market_cap = fetcher.get_market_cap(symbol)
     if market_cap:
       result["market_cap"] = market_cap / 1e6
     result["name"] = fetcher.get_name(symbol)
 
     # Fit model.
-    rev_week_values = week_values[::-1]
-    fitter = curve_fitting.CurveFitting(rev_week_values)
+    rev_averaged_values = averaged_values[::-1]
+    fitter = curve_fitting.CurveFitting(rev_averaged_values)
 
     # Update results.
     (poly_quadratic, poly_cubic, poly_linear) = self._Update(fitter, result)
@@ -133,7 +135,7 @@ class Runner(object):
     # Save plots.
     if make_graphs:
       with self._lock:
-        self._MakePlots(rev_week_values, percentual_change, fitter,
+        self._MakePlots(rev_averaged_values, percentual_change, fitter,
                         poly_quadratic, poly_cubic, poly_linear)
         plt.savefig(output_figure_path)
         plt.close('all')

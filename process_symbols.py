@@ -42,8 +42,10 @@ flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
 flags.FLAGS.add_argument("--output_path", required=True,
                          help="Output folder")
-flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
-                         help="Number of weeks. Starting from last")
+flags.FLAGS.add_argument("--num_days", type=int, default=30,
+                         help="Number of days. Starting from last")
+flags.FLAGS.add_argument("--window", type=int, default=5,
+                         help="Number of days to average over")
 flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
                          help="Number of threads")
 flags.FLAGS.add_argument("--make_graphs", default=False,
@@ -54,8 +56,8 @@ flags.FLAGS.add_argument("--iexcloud_token", required=True,
 FLAGS = flags.Parse()
 
 
-def _process_worker(runner, filename, num_weeks, output_path, make_graphs):
-  runner.Run(filename, num_weeks, output_path, make_graphs)
+def _process_worker(runner, filename, num_days, window, output_path, make_graphs):
+  runner.Run(filename, num_days, window, output_path, make_graphs)
 
 
 def main():
@@ -67,23 +69,23 @@ def main():
   lock = manager.Lock()
   runner = symbol_data_generator.Runner(
       lock, iexcloud_token=FLAGS.iexcloud_token)
-  pp = []
   for data_file in data_files:
-    pool.apply_async(_process_worker, [runner, data_file, FLAGS.num_weeks,
-                                       FLAGS.output_path, FLAGS.make_graphs])
+    _process_worker(runner, data_file, FLAGS.num_days,
+                    FLAGS.window, FLAGS.output_path,
+                    FLAGS.make_graphs)
 
-  try:
-    wait_seconds = len(data_files) / FLAGS.num_threads / 2
-    print('\rWaiting %d seconds...' % wait_seconds)
-    time.sleep(wait_seconds)
-  except KeyboardInterrupt as e:
-    print('STOPPING')
-    # Signal all workers to quit
-    pool.terminate()
-    pool.join()
-  else:
-    pool.close()
-    pool.join()
+  # try:
+  #   wait_seconds = len(data_files) / FLAGS.num_threads / 2
+  #   print('\rWaiting %d seconds...' % wait_seconds)
+  #   time.sleep(wait_seconds)
+  # except KeyboardInterrupt as e:
+  #   print('STOPPING')
+  #   # Signal all workers to quit
+  #   pool.terminate()
+  #   pool.join()
+  # else:
+  #   pool.close()
+  #   pool.join()
     print('Processed %d files' % len(data_files))
 
 

@@ -8,7 +8,9 @@ class AppReportAccessor(BaseReportAccessor):
 
   def __init__(self):
     super(AppReportAccessor, self).__init__()
-    self._report = ndb_data.ReportProperty()
+
+  def create(self, date):
+    self._report = ndb_data.ReportProperty(date=date)
 
   def save(self):
     self._report.put()

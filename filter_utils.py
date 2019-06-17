@@ -27,14 +27,14 @@ import math
 try:
   from absl import logging
 except ImportError:
-    import logging
+  import logging
 
 
 def _second_order_root(poly):
   """Returns the positive root of a 2nd-order polynomial."""
-  a = poly.coef[0]
-  b = poly.coef[1]
-  c = poly.coef[2]
+  a = poly["coef"][0]
+  b = poly["coef"][1]
+  c = poly["coef"][2]
   if 4 * a * c > b * b:
     return 0.0
   return - b + math.sqrt(b * b - 4 * a * c) / (2 * a)
@@ -49,33 +49,38 @@ def filter(data, data_filter):
   if "to_filter" in data_filter:
     for word in data_filter["to_filter"]:
       if word.lower() in data["name"].lower():
-        logging.debug("Symbol filtered")
+        logging.info("Symbol filtered")
         return True
 
   if "market_cap" in data:
     if (data["market_cap"] < data_filter["min_market_cap"] or
         data["market_cap"] > data_filter["max_market_cap"]):
-      logging.debug("Filtered by market cap")
+      logging.info("Filtered by market cap %d < %d < %d",
+                   data_filter["min_market_cap"], data["market_cap"],
+                   data_filter["max_market_cap"])
       return True
   else:
     if data_filter["filter_if_no_market_cap"]:
-      logging.debug("Filter if not market cap")
+      logging.info("Filter if not market cap")
       return True
 
   if (data["mean"] - data["std"] < 0 and
       not data_filter["negative_gradient_variation"]):
-    logging.debug("Filtered by negative gradient variation")
+    logging.info("Filtered by negative gradient variation")
     return True  # mean variation can go negative
   if data["mean"] < data_filter["min_mean"]:
-    logging.debug("Filtered by minimum mean")
+    logging.info("Filtered by minimum mean: %f < %f", data["mean"],
+                 data_filter["min_mean"])
     return True  # if increases less than X% in average
   for poly in data["poly"]:
     if poly["order"] == 1:
       if poly["coef"][0] < data_filter["min_linear_gradient"]:
-        logging.debug("Filtered by min_linear_gradient")
+        logging.info("Filtered by min_linear_gradient: %f < %f",
+                     poly["coef"][0], data_filter["min_linear_gradient"])
         return True
-      if poly["coef"][1] < data_filter["min_linear_offset"]:
-        logging.debug("Filtered by min_linear_offset")
+      if ("min_linear_offset" in data_filter and
+          poly["coef"][1] < data_filter["min_linear_offset"]):
+        logging.info("Filtered by min_linear_offset")
         return True
       #for coef in poly.coef:
       #    if coef < data_filter.min_linear_gradient:
@@ -83,18 +88,18 @@ def filter(data, data_filter):
       #    break
     if poly["order"] == 2:
       if poly["convex"] != data_filter["convex"]:
-        logging.debug("Filtered by convex")
+        logging.info("Filtered by convex")
         return True
-      if (x_convex_poly in data_filter and
+      if ("x_convex_poly" in data_filter and
           _second_order_root(poly) < data_filter["x_convex_poly"]):
-        logging.debug("Filtered by second order root")
+        logging.info("Filtered by second order root")
         return True
 
   # Remove penny shares.
-  if min_value in data_filter and mean_value in data:
+  if "min_value" in data_filter and "mean_value" in data:
     penny_share = data["mean_value"] < data_filter["min_value"]
     if penny_share:
-      logging.debug("Filtered by penny share")
+      logging.info("Filtered by penny share")
     return penny_share
 
   return False

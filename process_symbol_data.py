@@ -33,8 +33,10 @@ flags.FLAGS.add_argument("--filename", required=True,
                          help="Path to the data file")
 flags.FLAGS.add_argument("--output_path", required=True,
                          help="Output folder")
-flags.FLAGS.add_argument("--num_weeks", type=int, default=-1,
-                         help="Number of weeks to process. Starting from last")
+flags.FLAGS.add_argument("--num_days", type=int, default=30,
+                         help="Number of days to process. Starting from last")
+flags.FLAGS.add_argument("--window", type=int, default=5,
+                         help="Number of days to average over")
 flags.FLAGS.add_argument("--iexcloud_token", required=True,
                          help="iexcloud token")
 FLAGS = flags.Parse()
@@ -43,7 +45,8 @@ FLAGS = flags.Parse()
 def main():
   runner = symbol_data_generator.Runner(
       Lock(), iexcloud_token=FLAGS.iexcloud_token)
-  runner.Run(FLAGS.filename, FLAGS.num_weeks, FLAGS.output_path, True)
+  runner.Run(FLAGS.filename, FLAGS.num_days, FLAGS.window, FLAGS.output_path,
+             make_graphs=True)
 
 
 if __name__ == "__main__":

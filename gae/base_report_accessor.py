@@ -10,6 +10,10 @@ class BaseReportAccessor(object):
     self._report = None
 
   @abc.abstractmethod
+  def create(self, date):
+    raise NotImplementedError
+
+  @abc.abstractmethod
   def save(self):
     raise NotImplementedError
 

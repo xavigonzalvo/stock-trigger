@@ -54,8 +54,11 @@ class LastStocksReport(webapp2.RequestHandler):
     # Generate a report and regenerate it if it exists.
     reports_accessor = AppReportsAccessor()
     report_accessor = AppReportAccessor()
-    if report_accessor.load(reports_accessor.last_date()):
+    report_date = reports_accessor.last_date()
+    if report_accessor.load(report_date):
       self.response.write('<p>Regenerating report</p>')
+    else:
+      report_accessor.create(report_date)
     processor = gae_symbol_processor.SymbolProcessor(report_accessor)
     processor.filter_symbols(hard_data_filter, medium_data_filter)
     report_accessor.save()

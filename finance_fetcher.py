@@ -32,10 +32,6 @@ from urllib import urlencode
 from urllib2 import urlopen, HTTPError
 
 
-class Error(Exception):
-  pass
-
-
 class FinanceFetcher(object):
 
     def __init__(self, api_key=None, iexcloud_token=None):
@@ -66,7 +62,7 @@ class FinanceFetcher(object):
         The data as a list.
 
       Raises:
-        Error: if response doesn't contain the data.
+        Exception: if response doesn't contain the data.
       """
       try:
         values['function'] = self._TIME_SERIES[period]
@@ -84,7 +80,7 @@ class FinanceFetcher(object):
           if self._KEY_TIME_SERIES[period] not in data:
             logging.error("Key %s not in response data: %s",
                           self._KEY_TIME_SERIES[period], data)
-            raise Error("Couldn't process symbol")
+            raise Exception("Couldn't process symbol")
           time_data = data[self._KEY_TIME_SERIES[period]]
           sorted(time_data, key=lambda k: k, reverse=False)
           data = []
@@ -92,7 +88,7 @@ class FinanceFetcher(object):
             data.append(values_per_period['4. close'])
           return data
       except HTTPError as e:
-        raise Error('Failed to process query "{}" with error {}'.format(
+        raise Exception('Failed to process query "{}" with error {}'.format(
             values, e.code))
 
     def get_all_symbols(self):

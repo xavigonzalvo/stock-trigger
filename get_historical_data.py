@@ -32,7 +32,7 @@ import time
 
 import flags
 import util
-import finance_fetcher
+import iexcloud_finance_fetcher as finance_fetcher
 
 flags.FLAGS.add_argument("--symbol", required=False,
                          help="A single symbol")
@@ -45,30 +45,27 @@ flags.FLAGS.add_argument("--output_path", required=True,
 flags.FLAGS.add_argument("--overwrite",
                          help="Overwrite symbols", default=False,
                          action="store_true")
-flags.FLAGS.add_argument("--from_year", required=False, type=int, default=2010,
-                         help="Get data from this year")
-flags.FLAGS.add_argument("--period", required=False, default='w',
-                         help="One of m (month, w (week) or d (day)")
+flags.FLAGS.add_argument("--period", required=False, default='1m',
+                         help="e.g., 1m")
 FLAGS = flags.Parse()
 
 
-def fetch_data(worker_id, fetcher, symbols):
+def fetch_data(fetcher, symbols):
   """Worker to fetch symbol information."""
   for i in range(len(symbols)):
     symbol = symbols[i]
     current_year = date.today().year
-    filename = '%s-%d-%d.csv' % (symbol, FLAGS.from_year, current_year)
+    filename = '%s-%d.csv' % (symbol, current_year)
     output = os.path.join(FLAGS.output_path, filename)
     if os.path.exists(output) and not FLAGS.overwrite:
       continue
     try:
-      data = fetcher.get_historical(symbol, FLAGS.from_year,
-                                    current_year, FLAGS.period)
-    except finance_fetcher.Error as e:
-      pass
+      data = fetcher.get_historical(symbol, FLAGS.period)
+    except Exception as e:
+      print('Error:', e)
+    csv_data = ['close'] + map(str, data)
     with open(output, 'w') as f:
-      f.write(data)
-  print ('Worker %d processed %d symbols' % (worker_id, len(symbols)))
+      f.write("\n".join(csv_data))
 
 
 def main():
@@ -79,7 +76,7 @@ def main():
 
   print ('%d symbols to fetch' % len(symbols))
   fetcher = finance_fetcher.FinanceFetcher(FLAGS.api_key)
-  fetch_data(worker_id=0, fetcher=fetcher, symbols=symbols)
+  fetch_data(fetcher=fetcher, symbols=symbols)
   print ('Processed %d symbols' % len(symbols))
 
 

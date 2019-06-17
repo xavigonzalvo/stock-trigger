@@ -63,7 +63,7 @@ class SymbolProcessor(object):
           report.hard_good_symbols.append(data.name)
         if not filter_utils.filter(data, medium_data_filter):
           report.medium_good_symbols.append(data.name)
-        break
+        break  # we've processed the analysis of the correct date
       report.count_total += 1
 
   def _generate_symbol_report(self, symbols):

@@ -17,8 +17,10 @@ flags.DEFINE_string('output', '', 'Output path to save the symbols.')
 
 
 def market_cap_fn(x):
-  str = x.replace("M", "").replace("$", "").replace("B", "").replace("\"", "")
-  return float(str)
+  ret = x.replace("M", "").replace("$", "").replace("\"", "")
+  if "B" in ret:
+    ret = ret.replace(".", "000.").replace("B", "")
+  return float(ret)
 
 
 def main(argv):
