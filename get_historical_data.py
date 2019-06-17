@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from absl import logging
 from datetime import date
 import os
 import time
@@ -69,6 +70,7 @@ def fetch_data(fetcher, symbols):
 
 
 def main():
+  logging.set_verbosity(logging.INFO)
   if FLAGS.symbol:
     symbols = [FLAGS.symbol]
   else:

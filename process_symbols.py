@@ -86,7 +86,7 @@ def main():
   # else:
   #   pool.close()
   #   pool.join()
-    print('Processed %d files' % len(data_files))
+  print('Processed %d files' % len(data_files))
 
 
 if __name__ == "__main__":

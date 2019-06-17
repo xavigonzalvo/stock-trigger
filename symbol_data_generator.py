@@ -102,10 +102,16 @@ class Runner(object):
     output_result_path = os.path.join(output_path,
                                       '{}.json'.format(res_filename))
 
+    symbol = util.GetSymbolFromFilename(filename)
+    logging.info('Processing "%s"', symbol)
+
     # Read data.
     data = days_processor.read_data(filename)
     total_num_days = len(data)
     logging.info('%d days for analysis', total_num_days)
+
+    if not data:
+      return
 
     # Process data.
     close_data = []
@@ -117,12 +123,10 @@ class Runner(object):
     result = {}
     result["mean"] = mean
     result["std"] = std
-    symbol = util.GetSymbolFromFilename(filename)
-    logging.info('Processing "%s"', symbol)
     fetcher = FinanceFetcher(api_key=self._iexcloud_token)
     market_cap = fetcher.get_market_cap(symbol)
     if market_cap:
-      result["market_cap"] = market_cap / 1e6
+      result["market_cap"] = market_cap
     result["name"] = fetcher.get_name(symbol)
 
     # Fit model.

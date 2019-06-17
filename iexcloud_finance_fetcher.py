@@ -109,11 +109,11 @@ class FinanceFetcher(object):
       response = urlopen(req, timeout=15)
     except URLError, e:
       logging.error('Error getting response for market cap: %s', e)
-    finally:
-      data = json.loads(response.read())
-      if data['marketcap'] is not None:
-        return data['marketcap'] / 1000000
       return None
+    data = json.loads(response.read())
+    if data['marketcap'] is not None:
+      return data['marketcap'] / 1000000
+    return None
 
   def get_name(self, symbol):
     values = {
@@ -130,6 +130,6 @@ class FinanceFetcher(object):
       response = urlopen(req, timeout=15)
     except URLError, e:
       logging.error('Error getting response for name: %s', e)
-    finally:
-      data = json.loads(response.read())
-      return data['companyName']
+      return ""
+    data = json.loads(response.read())
+    return data['companyName']

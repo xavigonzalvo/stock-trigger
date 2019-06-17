@@ -42,14 +42,13 @@ flags.FLAGS.add_argument("--output_path", required=True,
                          help="Output folder")
 flags.FLAGS.add_argument("--num_threads", required=False, type=int, default=10,
                          help="Number of threads")
-flags.FLAGS.add_argument("--debug", required=False, type=bool, default=False,
-                         help="If true, print filtered causes")
 FLAGS = flags.Parse()
 
 
 def _filter_worker(data_filter, filename, output_path):
   data = util.read_json(filename)
 
+  logging.info('Filtering %s', filename)
   if filter_utils.filter(data, data_filter):
     return
 
@@ -61,20 +60,14 @@ def _filter_worker(data_filter, filename, output_path):
 
 
 def main():
-  if FLAGS.debug:
-    logging.set_verbosity(logging.DEBUG)
-
+  logging.set_verbosity(logging.INFO)
   data_filter = util.read_json(FLAGS.filter)
   print(json.dumps(data_filter, indent=4, sort_keys=True))
 
   data_files = util.SafeReadLines(FLAGS.filename)
-  print('Processing %d files' % len(data_files))
-  pool = Pool(processes=FLAGS.num_threads)
+  logging.info('Processing %d files', len(data_files))
   for data_file in data_files:
-    pool.apply_async(_filter_worker, [data_filter, data_file,
-                                      FLAGS.output_path])
-  pool.close()
-  pool.join()
+    _filter_worker(data_filter, data_file, FLAGS.output_path)
 
 
 if __name__ == "__main__":
