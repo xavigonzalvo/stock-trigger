@@ -98,7 +98,7 @@ class BestStocksProcess(webapp2.RequestHandler):
         process_period = '40'
       process_window = self.request.get('process_window')
       if not process_window:
-        process_window = '5'
+        process_window = '3'
 
       self.response.write('<p>Processing %d symbols</p>' % len(symbols))
       self.response.write('<p>Fetch period: %s</p>' % fetch_period)
