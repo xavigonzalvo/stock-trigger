@@ -60,9 +60,9 @@ class SymbolProcessor(object):
         data = json.loads(analysis.data)
 
         if not filter_utils.filter(data, hard_data_filter):
-          report.hard_good_symbols.append(data.name)
+          report.hard_good_symbols.append(data["name"])
         if not filter_utils.filter(data, medium_data_filter):
-          report.medium_good_symbols.append(data.name)
+          report.medium_good_symbols.append(data["name"])
         break  # we've processed the analysis of the correct date
       report.count_total += 1
 
@@ -71,7 +71,7 @@ class SymbolProcessor(object):
     html_lines = []
     HTML_PART = '<a href="%s?q=%s&ei=HejzUoiYBavGwAPk8gE">%s</a><br>'
     for symbol in symbols:
-      url_symbol = urllib.quote('LON:%s' % symbol.replace('.L',''))
+      url_symbol = urllib.quote('%s' % symbol.replace('.L',''))
       html_lines.append(HTML_PART % (gae_config.WEB_FINANCE, url_symbol,
                                      symbol))
     return html_lines

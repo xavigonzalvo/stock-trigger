@@ -111,8 +111,9 @@ class FinanceFetcher(object):
       logging.error('Error getting response for market cap: %s', e)
       return None
     data = json.loads(response.read())
-    if data['marketcap'] is not None:
+    if 'marketcap' in data and data['marketcap'] is not None:
       return data['marketcap'] / 1000000
+    logging.error('Wrong data contains: %s', data)
     return None
 
   def get_name(self, symbol):
@@ -132,4 +133,7 @@ class FinanceFetcher(object):
       logging.error('Error getting response for name: %s', e)
       return ""
     data = json.loads(response.read())
-    return data['companyName']
+    if 'companyName' in data:
+      return data['companyName']
+    logging.error('Wrong data contains: %s', data)
+    return ""
