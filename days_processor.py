@@ -112,7 +112,7 @@ class DaysProcessor(object):
     """Models data using polynomial models.
 
     Returns:
-      week_result_pb2.WeekResult
+      A `Dict` with the result.
     """
     (percentage_change_per_day, week_values,
      mean, std, mean_value) = self.process()

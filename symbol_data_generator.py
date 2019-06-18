@@ -40,8 +40,8 @@ class Runner(object):
     self._lock = lock
     self._iexcloud_token = iexcloud_token
 
-  def _MakePlots(self, rev_week_values, slopes, fitter,
-                 poly_quadratic, poly_cubic, poly_linear):
+  def _make_plots(self, rev_week_values, slopes, fitter,
+                  poly_quadratic, poly_cubic, poly_linear):
     plt.subplot(411)
     plt.title('Histogram of gradients')
     util.PlotHistogram(slopes)
@@ -139,8 +139,8 @@ class Runner(object):
     # Save plots.
     if make_graphs:
       with self._lock:
-        self._MakePlots(rev_averaged_values, percentual_change, fitter,
-                        poly_quadratic, poly_cubic, poly_linear)
+        self._make_plots(rev_averaged_values, percentual_change, fitter,
+                         poly_quadratic, poly_cubic, poly_linear)
         plt.savefig(output_figure_path)
         plt.close('all')
 
