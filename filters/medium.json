@@ -1,6 +1,6 @@
 {
-  "_comment": "Soft filter. The mean percentual change minus the std can go below zero but it filters penny shares by forcing second coefficient of linear regression to be over 100.",
-  "name": "soft",
+  "_comment": "Medium filter. The mean percentual change minus the std can go below zero but it filters penny shares by forcing second coefficient of linear regression to be over 100.",
+  "name": "medium",
   "min_mean": 0.1,
   "negative_gradient_variation": true,
   "min_linear_gradient": 1.0,

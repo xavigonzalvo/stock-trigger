@@ -51,7 +51,7 @@ flags.FLAGS.add_argument("--period", required=False, default='1m',
 FLAGS = flags.Parse()
 
 
-def fetch_data(fetcher, symbols):
+def _fetch_data(fetcher, symbols):
   """Worker to fetch symbol information."""
   for i in range(len(symbols)):
     symbol = symbols[i]
@@ -63,7 +63,8 @@ def fetch_data(fetcher, symbols):
     try:
       data = fetcher.get_historical(symbol, FLAGS.period)
     except Exception as e:
-      print('Error:', e)
+      logging.error('Error with symbol %s: %s', symbol, e)
+      continue
     csv_data = ['close'] + map(str, data)
     with open(output, 'w') as f:
       f.write("\n".join(csv_data))
@@ -76,10 +77,10 @@ def main():
   else:
     symbols = util.SafeReadLines(FLAGS.filename)
 
-  print ('%d symbols to fetch' % len(symbols))
+  logging.info('%d symbols to fetch' % len(symbols))
   fetcher = finance_fetcher.FinanceFetcher(FLAGS.api_key)
-  fetch_data(fetcher=fetcher, symbols=symbols)
-  print ('Processed %d symbols' % len(symbols))
+  _fetch_data(fetcher=fetcher, symbols=symbols)
+  logging.info('Processed %d symbols' % len(symbols))
 
 
 if __name__ == '__main__':

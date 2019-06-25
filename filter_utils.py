@@ -82,10 +82,6 @@ def filter(data, data_filter):
           poly["coef"][1] < data_filter["min_linear_offset"]):
         logging.info("Filtered by min_linear_offset")
         return True
-      #for coef in poly.coef:
-      #    if coef < data_filter.min_linear_gradient:
-      #        return True
-      #    break
     if poly["order"] == 2:
       if poly["convex"] != data_filter["convex"]:
         logging.info("Filtered by convex")

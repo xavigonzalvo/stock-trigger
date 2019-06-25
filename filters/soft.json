@@ -8,5 +8,4 @@
   "filter_if_no_market_cap": false,
   "min_market_cap": 30,
   "max_market_cap": 350,
-  "to_filter": []
 }

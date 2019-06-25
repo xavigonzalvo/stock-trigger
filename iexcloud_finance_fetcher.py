@@ -68,8 +68,8 @@ class FinanceFetcher(object):
     try:
       response = urlopen(req, timeout=15)
     except URLError, e:
-      logging.error('Error getting response for historical data: %s', e)
-      raise Exception
+      logging.error('Failed request {} with error: {}'.format(req, e))
+      raise Exception('Error getting response for historical data')
     data = json.loads(response.read())
     historical_close_values = []
     for day in data:
@@ -104,7 +104,7 @@ class FinanceFetcher(object):
       'symbol': symbol,
       'values': values
     }
-    req = '{url}/stable/stock/{symbol}/stats?{values}'.format(**info)
+    req = '{url}/stable/stock/{symbol}/quote/marketcap?{values}'.format(**info)
     try:
       response = urlopen(req, timeout=15)
     except URLError, e:
@@ -113,7 +113,7 @@ class FinanceFetcher(object):
     data = json.loads(response.read())
     if 'marketcap' in data and data['marketcap'] is not None:
       return data['marketcap'] / 1000000
-    logging.error('Wrong data contains: %s', data)
+    logging.error('Request ""%s" data contains: %s', req, data)
     return None
 
   def get_name(self, symbol):

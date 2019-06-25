@@ -43,12 +43,12 @@ Build protocol buffers for this project:
 
         $ mkdir data/res
         $ for f in `ls data/csv/*.csv`; do echo $f; done > /tmp/list
-        $ ./process_symbols.py --filename /tmp/list --num_weeks 10 --output_path data/res/ --num_threads=10
+        $ ./process_symbols.py --filename /tmp/list --num_days 40 --window 5 --output_path data/res/ --num_threads=10 --iexcloud_token XX
 
 * One symbol:
 
         $ mkdir data/res
-        $ ./process_symbol_data.py --filename data/csv/CINE.L-2010-2015-week.csv --output_path data/res --num_weeks 8
+        $ ./process_symbol_data.py --filename data/csv/CINE.L-2010-2015-week.csv --num_days 40 --window 5 --output_path data/res  --iexcloud_token XX
 
 
 ### Filtering symbols
