@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Tool to process information extracted from get_historical_data.
 
 The MIT License (MIT)
